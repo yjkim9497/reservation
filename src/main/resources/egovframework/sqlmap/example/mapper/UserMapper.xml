@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.mapper.UserMapper">
+
+    <resultMap id="user" type="egovframework.vo.UserVO">
+        <result property="id" column="id"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="birth" column="birth"/>
+        <result property="regDate" column="reg_date"/>
+    </resultMap>
+    
+    <resultMap id="login" type="egovframework.vo.LoginVO">
+    	<result property="id" column="id"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <!-- 회원가입 -->
+    <insert id="insertUser" parameterType="egovframework.vo.UserVO">
+        INSERT INTO USER (ID, PASSWORD, ROLE, NAME, EMAIL, PHONE, BIRTH, REG_DATE)
+        VALUES (#{id}, #{password}, #{role}, #{name}, #{email}, #{phone}, #{birth} , NOW())
+    </insert>
+    
+    <select id="actionLogin" resultMap="login">
+            SELECT ID AS id
+                 , PASSWORD AS password
+                 , ROLE AS role
+              FROM USER 
+        	  WHERE ID = #{id} AND PASSWORD = #{password}
+	</select>
+
+    <!-- 회원 정보 조회 -->
+    <select id="selectUser"  parameterType="string" resultMap="user">
+        SELECT ID, PASSWORD, ROLE, NAME, EMAIL, PHONE, BIRTH, REG_DATE 
+        FROM USER 
+        WHERE ID = #{id}
+    </select>
+    
+    <select id="selectAllUsers" resultMap="user">
+    	SELECT * FROM USER; <!-- 테이블 이름은 실제 테이블명으로 변경 -->
+	</select>
+	
+	<!-- 사용자 삭제 -->
+    <delete id="deleteUser" parameterType="string">
+        DELETE FROM USER WHERE id = #{id}
+    </delete>
+
+    <!-- 사용자 수정 -->
+    <update id="updateUser" parameterType="egovframework.vo.UserVO">
+        UPDATE USER
+        SET password = #{password},
+            role = #{role},
+            name = #{name},
+            email = #{email},
+            phone = #{phone},
+            birth = #{birth},
+            reg_date = #{regDate}
+        WHERE id = #{id}
+    </update>
+    
+    <select id="countById" resultType="int">
+    	SELECT COUNT(*) FROM user WHERE id = #{id}
+	</select>
+
+</mapper>
