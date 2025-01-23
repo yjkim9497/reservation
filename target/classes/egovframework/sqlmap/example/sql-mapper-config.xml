@@ -8,5 +8,6 @@
 		<typeAlias alias="sampleVO" type="egovframework.vo.SampleVO"/>
 		<typeAlias alias="userVO" type="egovframework.vo.UserVO"/>
 		<typeAlias alias="loginVO" type="egovframework.vo.LoginVO"/>
+		<typeAlias alias="reserveVO" type="egovframework.vo.ReserveVO"/>
     </typeAliases>
 </configuration>
