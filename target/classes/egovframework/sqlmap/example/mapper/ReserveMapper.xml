@@ -4,25 +4,98 @@
 
 <mapper namespace="egovframework.mapper.ReserveMapper">
 
+	<resultMap id="ReserveResultMap" type="egovframework.vo.ReserveVO">
+        <result column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="reservation_time" property="reservationTime"/>
+        <result column="date" property="date"/>
+        <result column="time_slot" property="timeSlot"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="birthdate" property="birthdate"/>
+        <result column="number_of_people" property="numberOfPeople"/>
+        <result column="max_capacity" property="maxCapacity"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+    
     <!-- 날짜로 예약 목록 조회 -->
-    <select id="findByDate" parameterType="java.time.LocalDate" resultType="egovframework.vo.ReserveVO">
-        SELECT * 
-        FROM reservations 
-        WHERE date = #{date}
+    <select id="findByDate" parameterType="java.time.LocalDate" resultMap="ReserveResultMap">
+        SELECT * FROM reservations WHERE date = #{date}
     </select>
 
     <!-- ID로 예약 조회 -->
-    <select id="findById" parameterType="long" resultType="egovframework.vo.ReserveVO">
-        SELECT * 
-        FROM reservations 
-        WHERE id = #{id}
+    <select id="findById" parameterType="long" resultMap="ReserveResultMap">
+        SELECT * FROM reservations WHERE id = #{id}
+    </select>
+
+    <!-- 모든 예약 조회 -->
+    <select id="findAllReservations" resultMap="ReserveResultMap">
+        SELECT * FROM reservations
     </select>
 
     <!-- 예약 상태 업데이트 -->
-    <update id="updateReservationStatus" parameterType="egovframework.vo.ReserveVO">
+    <update id="updateReservationStatus" parameterType="map">
         UPDATE reservations
-        SET status = #{status}
+        SET status = #{status}, user_id = #{userId}
         WHERE id = #{id}
+    </update>
+
+    <!-- 예약 가능 시간 추가 (관리자) -->
+    <insert id="addAvailableReservation">
+        INSERT INTO reservations (date, time_slot, status, reservation_time) 
+        VALUES (#{date}, #{timeSlot}, 'AVAILABLE', CURRENT_TIMESTAMP)
+    </insert>
+
+    <!-- 사용자의 예약 조회 -->
+    <select id="getUserReservations" parameterType="long" resultMap="ReserveResultMap">
+        SELECT * FROM reservations WHERE user_id = #{userId}
+    </select>
+
+    <!-- 예약 승인 (관리자) -->
+    <update id="approveReservation">
+        UPDATE reservations 
+        SET status = 'COMPLETED'
+        WHERE id = #{id}
+    </update>
+
+    <!-- 예약 취소 (관리자 또는 사용자) -->
+    <update id="cancelReservation">
+        UPDATE reservations 
+        SET status = 'CANCELED'
+        WHERE id = #{id}
+    </update>
+
+    <!-- 예약 삭제 (관리자) -->
+    <delete id="deleteReservation">
+        DELETE FROM reservations WHERE id = #{id}
+    </delete>
+
+    <!-- 현재 예약된 인원 조회 -->
+    <select id="getCurrentReservationCount" parameterType="map" resultType="int">
+        SELECT SUM(number_of_people) 
+        FROM reservations 
+        WHERE date = #{date} AND time_slot = #{timeSlot}
+    </select>
+
+    <!-- 예약 추가 (정원 초과 확인) -->
+    <insert id="addUserReservation">
+        INSERT INTO reservations (user_name, date, time_slot, phone, email, birthdate, number_of_people, status, user_id)
+        VALUES (#{userName}, #{date}, #{timeSlot}, #{phone}, #{email}, #{birthdate}, #{numberOfPeople}, 'COMPLETED', #{userId})
+    </insert>
+
+    <!-- 예약 인원 증가 (예약 승인 시) -->
+    <update id="increaseReservationCount">
+        UPDATE reservations
+        SET number_of_people = number_of_people + #{numberOfPeople}
+        WHERE id = #{id} AND number_of_people + #{numberOfPeople} <= max_capacity
+    </update>
+
+    <!-- 예약 인원 감소 (예약 취소 시) -->
+    <update id="decreaseReservationCount">
+        UPDATE reservations
+        SET number_of_people = number_of_people - #{numberOfPeople}
+        WHERE id = #{id} AND number_of_people >= #{numberOfPeople}
     </update>
 
 </mapper>

@@ -6,6 +6,10 @@ import java.util.Date;
 import javax.persistence.Column;
 
 public class UserVO {
+	
+	@Column(name = "user_id")
+	private Long userId;
+	
 	private String id;       // 사용자 ID
     private String password; // 비밀번호
     private String role = "general"; // 기본값 general

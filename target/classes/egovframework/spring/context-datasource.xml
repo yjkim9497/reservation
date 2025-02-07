@@ -20,12 +20,19 @@
     <alias name="dataSource-${Globals.DbType}" alias="egov.dataSource" />
     
     <!-- maria -->
-	<bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+	<!-- <bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
 	    <property name="driverClassName" value="${Globals.DriverClassName}"/>
 	    <property name="url" value="${Globals.Url}" />
 	    <property name="username" value="${Globals.UserName}"/>
 	    <property name="password" value="${Globals.Password}"/>
-	</bean>
+	</bean> -->
+	
+	<bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+    	<property name="driverClassName" value="#{egovEnvCryptoService.decrypt('${Globals.DriverClassName}')}" />
+    	<property name="url" value="#{egovEnvCryptoService.decrypt('${Globals.Url}')}" />
+    	<property name="username" value="#{egovEnvCryptoService.decrypt('${Globals.UserName}')}" />
+    	<property name="password" value="#{egovEnvCryptoService.decrypt('${Globals.Password}')}" />
+    </bean>
 
     
 </beans>
