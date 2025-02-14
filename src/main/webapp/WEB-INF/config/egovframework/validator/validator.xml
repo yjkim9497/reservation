@@ -6,16 +6,13 @@
 <form-validation>
 
     <formset>
-        <form name="sampleVO">
-        	<field property="name" depends="required">
-        		<arg0 key="title.sample.name" />
+        <form name="boardVO">
+        	<field property="boardTitle" depends="required">
+        		<arg0 key="board.boardTitle" />
 			</field>
-			<field property="description" depends="required">
-                <arg0 key="title.sample.description" />
+			<field property="boardDescription" depends="required">
+                <arg0 key="board.boardDescription" />
             </field>
-        	<field property="regUser" depends="required">
-        		<arg0 key="title.sample.regUser" />
-			</field>
         </form>
     </formset>
 

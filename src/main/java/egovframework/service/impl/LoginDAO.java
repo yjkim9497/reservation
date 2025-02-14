@@ -22,9 +22,9 @@ public class LoginDAO extends EgovAbstractMapper {
 	
 	public LoginVO actionLogin(LoginVO vo) throws Exception {
 		System.out.println("dao단으로 넘어옴");
-		System.out.println("DAO에서 받은 파라미터: " + vo.getId() + ", " + vo.getPassword());
+		System.out.println("DAO에서 받은 파라미터: " + vo.getUserId() + ", " + vo.getUserPassword());
 	    LoginVO result = sqlSession.selectOne("egovframework.mapper.UserMapper.actionLogin", vo);
-	    System.out.println("DAO에서 반환된 결과: " + (result != null ? result.getId() : "null"));
+	    System.out.println("DAO에서 반환된 결과: " + (result != null ? result.getUserId() : "null"));
 	    return result;
 	}
 }

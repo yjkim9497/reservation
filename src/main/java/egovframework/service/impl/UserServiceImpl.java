@@ -26,11 +26,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(UserVO userVO) {
     	
-    	if (userVO.getRegDate() == null) {
-            userVO.setRegDate(LocalDateTime.now());
+    	if (userVO.getUserRegDate() == null) {
+            userVO.setUserRegDate(LocalDateTime.now());
         }
     	
-    	System.out.println("회원가입 서비스 단"+userVO.getRole());
+    	System.out.println("회원가입 서비스 단"+userVO.getUserRole());
 
         userMapper.insertUser(userVO);
     }
@@ -47,9 +47,9 @@ public class UserServiceImpl implements UserService {
         // 이메일과 연락처 복호화 처리
         return users.stream()
             .map(user -> {
-                user.setEmail(cryptoService.decrypt(user.getEmail()));
-                user.setPhone(formatPhone(cryptoService.decrypt(user.getPhone())));
-                user.setRegDateFormatted(formatRegDate(user.getRegDate()));
+                user.setUserEmail(cryptoService.decrypt(user.getUserEmail()));
+                user.setUserPhone(formatPhone(cryptoService.decrypt(user.getUserPhone())));
+                user.setRegDateFormatted(formatRegDate(user.getUserRegDate()));
                 return user;
             })
             .collect(Collectors.toList());

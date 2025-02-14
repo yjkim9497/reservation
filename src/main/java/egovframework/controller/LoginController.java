@@ -73,11 +73,11 @@ public class LoginController {
 	@RequestMapping(value = "/actionLogin.do", method = RequestMethod.POST)
 	public String actionLogin(@ModelAttribute("loginVO") LoginVO loginVO, HttpServletRequest request, Model model) throws Exception {
 		System.out.println("로그인 컨트롤러");
-		System.out.println("vo 아이디"+loginVO.getId());
+		System.out.println("vo 아이디"+loginVO.getUserId());
 		
 		// 입력된 비밀번호 암호화
-		String hashedPassword = egovPasswordEncoder.encryptPassword(loginVO.getPassword());
-        loginVO.setPassword(hashedPassword);
+		String hashedPassword = egovPasswordEncoder.encryptPassword(loginVO.getUserPassword());
+        loginVO.setUserPassword(hashedPassword);
 	    
 		// 1. 일반 로그인 처리
 		LoginVO resultVO = loginService.actionLogin(loginVO);
@@ -86,19 +86,19 @@ public class LoginController {
 		    model.addAttribute("message", "로그인에 실패하였습니다.");
 		    return "login";
 		}
-		System.out.println("아이디"+resultVO.getId());
+		System.out.println("아이디"+resultVO.getUserId());
 		boolean loginPolicyYn = true;
 
-		if (resultVO != null && resultVO.getId() != null && !resultVO.getId().equals("") && loginPolicyYn) {
+		if (resultVO != null && resultVO.getUserId() != null && !resultVO.getUserId().equals("") && loginPolicyYn) {
 			System.out.println("로그인 정보 전송 성공");
 			request.getSession().setAttribute("LoginVO", resultVO);
 			LoginVO sessionUser = (LoginVO) request.getSession().getAttribute("LoginVO");
 			if (sessionUser != null) {
-			    System.out.println("세션에 저장된 사용자 ID: " + sessionUser.getId());
+			    System.out.println("세션에 저장된 사용자 pk: " + sessionUser.getUserPk());
 			} else {
 			    System.out.println("세션에 데이터가 없습니다.");
 			}
-			return "forward:egovSampleList.do";
+			return "forward:main.do";
 		} else {
 
 			model.addAttribute("message", "로그인에 실패하였습니다.");
@@ -131,7 +131,7 @@ public class LoginController {
     public String logout(HttpServletRequest request) throws Exception {
         // 세션에서 LoginVO 객체 제거
         request.getSession().invalidate();
-        return "redirect:/egovSampleList.do"; // 로그아웃 후 홈으로 리다이렉트
+        return "redirect:/main.do"; // 로그아웃 후 홈으로 리다이렉트
     }
 
 }

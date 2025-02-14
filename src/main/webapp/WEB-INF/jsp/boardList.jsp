@@ -21,7 +21,7 @@
 
         <!-- Search Section -->
         <div class="card p-3 mb-4">
-            <form:form modelAttribute="searchVO" id="listForm" name="listForm" method="post">
+            <form:form modelAttribute="searchVO" id="listForm" name="listForm" method="get">
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <form:select path="searchCondition" cssClass="form-select">
@@ -47,11 +47,8 @@
                 <thead class="table-light">
                     <tr>
                         <th scope="col" class="text-center">No</th>
-                        <th scope="col" class="text-center"><spring:message code="title.sample.id" /></th>
-                        <th scope="col" class="text-center"><spring:message code="title.sample.name" /></th>
-                        <th scope="col" class="text-center"><spring:message code="title.sample.useYn" /></th>
-                        <th scope="col" class="text-center"><spring:message code="title.sample.description" /></th>
-                        <th scope="col" class="text-center"><spring:message code="title.sample.regUser" /></th>
+                        <th scope="col" class="text-center">제목</th>
+              			<th scope="col" class="text-center">사용자</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,13 +57,8 @@
                             <td class="text-center">
                                 <c:out value="${paginationInfo.totalRecordCount+1 - ((searchVO.pageIndex-1) * searchVO.pageSize + status.count)}" />
                             </td>
-                            <td class="text-center">
-                                <a href="javascript:fn_egov_select('<c:out value="${result.id}"/>')"><c:out value="${result.id}"/></a>
-                            </td>
-                            <td><c:out value="${result.name}" /></td>
-                            <td class="text-center"><c:out value="${result.useYn}" /></td>
-                            <td><c:out value="${result.description}" /></td>
-                            <td class="text-center"><c:out value="${result.regUser}" /></td>
+                            <td><c:out value="${result.boardTitle}" /></td>
+                            <td class="text-center"><c:out value="${result.userName}" /></td>
                         </tr>
                     </c:forEach>
                 </tbody>
@@ -94,7 +86,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     function fn_egov_addView() {
-        document.listForm.action = "<c:url value='/addSample.do'/>";
+        document.listForm.action = "<c:url value='/addBoard.do'/>";
         document.listForm.submit();
     } 
         // 기존 JavaScript 함수 유지

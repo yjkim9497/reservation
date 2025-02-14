@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import egovframework.mapper.ReserveMapper;
+import egovframework.mapper.SeminarMapper;
 import egovframework.service.ReserveService;
 import egovframework.vo.ReserveStatus;
 import egovframework.vo.ReserveVO;
+import egovframework.vo.SeminarVO;
 
 @Service
 public class ReserveServiceImpl implements ReserveService {
@@ -17,23 +19,18 @@ public class ReserveServiceImpl implements ReserveService {
 	@Autowired
 	private ReserveMapper reserveMapper;
 	
+	@Autowired
+	private SeminarMapper seminarMapper;
+	
 	@Override
     public List<ReserveVO> getReservationsByDate(LocalDate date) {
         return reserveMapper.findByDate(date);
     }
 
 	@Override
-	public ReserveVO bookReservation(Long id, Long userId) {
-        ReserveVO reservation = reserveMapper.findById(id);
-        if (reservation == null) {
-            throw new RuntimeException("Reservation not found");
-        }
-//        if (!"AVAILABLE".equals(reservation.getStatus())) {
-//            throw new RuntimeException("이미 예약 완료된 항목입니다.");
-//        }
-        reservation.setStatus(ReserveStatus.PROGRESSING);
-        reserveMapper.updateReservationStatus(id, ReserveStatus.PROGRESSING, userId);
-        return reservation;
+	public ReserveVO bookReservation(ReserveVO reserveVO) {
+		reserveMapper.insertReservation(reserveVO);
+		return reserveVO;
     }
 	
 	@Override

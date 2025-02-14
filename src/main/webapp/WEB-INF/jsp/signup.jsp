@@ -61,19 +61,34 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script type="text/javascript">
-	    function actionSignup() {
-	
-	/*         if (document.loginForm.id.value == "") {
-	            alert("아이디를 입력하세요");
-	            return false;
-	        } else if (document.loginForm.password.value == "") {
-	            alert("비밀번호를 입력하세요");
-	            return false;
-	        } else { */
-	            document.signupForm.action = "<c:url value='actionSignup.do'/>";
-	            document.signupForm.submit();
-	     /*    } */
-	    }
+	function actionSignup() {
+        var formData = {
+            userId: $("#userId").val(),
+            userPassword: $("#userPassword").val(),
+            userName: $("input[name='userName']").val(),
+            userEmail: $("input[name='userEmail']").val(),
+            userPhone: $("input[name='userPhone']").val(),
+            userBirth: $("input[name='userBirth']").val()
+        };
+
+        $.ajax({
+            url: "<c:url value='/actionSignup.do'/>",  // 서버 URL
+            type: "POST",
+            data: formData,
+            success: function(response) {
+            	console.log(response)
+                if (response.success) {
+                    alert("회원가입이 완료되었습니다.");
+                    window.location.href = "/login";  // 로그인 페이지로 리다이렉트
+                } else {
+                    alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+                }
+            },
+            error: function() {
+                alert("서버 오류로 인해 회원가입에 실패했습니다.");
+            }
+        });
+    }
 	    
 	    function checkDuplicateId(id) {
 	        // 서버로 AJAX 요청하여 아이디 중복 확인
@@ -99,12 +114,12 @@
         </h1>
        <%--  <form:form method="post" name="signupForm" action="actionSignup"> --%>
         <form:form modelAttribute="userVO" id="signupForm" name="signupForm">
-        	<input type="text" id="id" name="id" placeholder="아이디" required onblur="checkDuplicateId(this.value)">
-            <input type="password" id="password" name="password" placeholder="비밀번호" required>
-            <input type="text" name="name" placeholder="이름" required>
-            <input type="email" name="email" placeholder="이메일" required>
-            <input type="tel" name="phone" placeholder="전화번호" required>
-            <input type="date" name="birth" placeholder="생년월일" required>
+        	<input type="text" id="userId" name="userId" placeholder="아이디" required onblur="checkDuplicateId(this.value)">
+            <input type="password" id="userPassword" name="userPassword" placeholder="비밀번호" required>
+            <input type="text" name="userName" placeholder="이름" required>
+            <input type="email" name="userEmail" placeholder="이메일" required>
+            <input type="tel" name="userPhone" placeholder="전화번호" required>
+            <input type="date" name="userBirth" placeholder="생년월일" required>
             <button type="button" onclick="actionSignup()">회원가입</button>
         </form:form>
     </div>

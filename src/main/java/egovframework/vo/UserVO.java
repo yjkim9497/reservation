@@ -1,24 +1,22 @@
 package egovframework.vo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.persistence.Column;
-
 public class UserVO {
 	
-	@Column(name = "user_id")
-	private Long userId;
-	
-	private String id;       // 사용자 ID
-    private String password; // 비밀번호
-    private String role = "general"; // 기본값 general
-    private String name;     // 이름
-    private String email;    // 이메일
-    private String phone;    // 전화번호
-    private Date birth;	// 생년월일
-    @Column(name = "reg_date")
-    private LocalDateTime regDate;  // 가입일
+	private Long userPk;             // 기본 키 (AUTO_INCREMENT)
+    private String userId;           // 사용자 ID
+    private String userPassword;     // 비밀번호
+    private UserRole userRole = UserRole.GENERAL;         // 역할   GENERAL, ADMIN
+    private String userName;         // 이름
+    private String userEmail;        // 이메일
+    private String userPhone;        // 전화번호
+    private Date userBirth;     // 생년월일
+    private LocalDateTime userRegDate; // 가입일 (기본값: 현재 시간)
+    private Boolean userLock = false;        // 계정 잠금 여부
+    private Integer userLockCount = 0;   // 계정 잠금 횟수
     
     private String regDateFormatted; // 포매팅된 가입일
 
@@ -30,58 +28,71 @@ public class UserVO {
         this.regDateFormatted = regDateFormatted;
     }
     
- // 기본 생성자
-    public UserVO() {
-        this.role = "general"; // 기본값 설정
-    }
-    
-    public String getRole() {
-		return role;
+	public Long getUserPk() {
+		return userPk;
 	}
-	public void setRole(String role) {
-		this.role = role;
+	public void setUserPk(Long userPk) {
+		this.userPk = userPk;
 	}
-	public Date getBirth() {
-		return birth;
+	public String getUserId() {
+		return userId;
 	}
-	public void setBirth(Date birth) {
-		this.birth = birth;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public String getId() {
-		return id;
+	public String getUserPassword() {
+		return userPassword;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
 	}
-	public String getPassword() {
-		return password;
+	public UserRole getUserRole() {
+		return userRole;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setUserRole(UserRole userRole) {
+		this.userRole = userRole;
 	}
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
-	public String getEmail() {
-		return email;
+	public String getUserEmail() {
+		return userEmail;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
-	public String getPhone() {
-		return phone;
+	public String getUserPhone() {
+		return userPhone;
 	}
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setUserPhone(String userPhone) {
+		this.userPhone = userPhone;
 	}
-	public LocalDateTime getRegDate() {
-		return regDate;
+	public Date getUserBirth() {
+		return userBirth;
 	}
-	public void setRegDate(LocalDateTime regDate) {
-		this.regDate = regDate;
+	public void setUserBirth(Date userBirth) {
+		this.userBirth = userBirth;
+	}
+	public LocalDateTime getUserRegDate() {
+		return userRegDate;
+	}
+	public void setUserRegDate(LocalDateTime userRegDate) {
+		this.userRegDate = userRegDate;
+	}
+	public Boolean getUserLock() {
+		return userLock;
+	}
+	public void setUserLock(Boolean userLock) {
+		this.userLock = userLock;
+	}
+	public Integer getUserLockCount() {
+		return userLockCount;
+	}
+	public void setUserLockCount(Integer userLockCount) {
+		this.userLockCount = userLockCount;
 	}
 
     

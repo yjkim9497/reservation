@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.mapper.BoardMapper">
+
+    <!-- BoardVO와 매칭되는 resultMap 정의 -->
+    <resultMap id="boardResultMap" type="egovframework.vo.BoardVO">
+        <result property="boardPk" column="board_pk"/>
+        <result property="boardTitle" column="board_title"/>
+        <result property="boardDescription" column="board_description"/>
+        <result property="boardRegDate" column="board_reg_date"/>
+        <result property="userPk" column="user_pk"/>
+    </resultMap>
+
+    <!-- 게시글 등록 -->
+    <insert id="insertBoard" parameterType="egovframework.vo.BoardVO">
+        INSERT INTO board 
+            (board_title, board_description, board_reg_date, user_pk)
+        VALUES 
+            (#{boardTitle}, #{boardDescription}, NOW(), #{userPk})
+    </insert>
+
+    <!-- 게시글 수정 -->
+    <update id="updateBoard" parameterType="egovframework.vo.BoardVO">
+        UPDATE board
+        SET board_title = #{boardTitle},
+            board_description = #{boardDescription},
+            user_pk = #{userPk}
+        WHERE board_pk = #{boardPk}
+    </update>
+
+    <!-- 게시글 삭제 -->
+    <delete id="deleteBoard">
+        DELETE FROM board WHERE board_pk = #{boardPk}
+    </delete>
+
+    <!-- 특정 게시글 조회 -->
+    <select id="selectBoard" parameterType="long" resultMap="boardResultMap">
+        SELECT board_pk, board_title, board_description, board_reg_date, user_pk
+        FROM board
+        WHERE board_pk = #{boardPk}
+    </select>
+
+    <!-- 게시글 목록 조회 -->
+    <select id="selectBoardList" parameterType="egovframework.vo.BoardVO" resultType="egovMap">
+	    SELECT 
+	        b.board_pk, 
+	        b.board_title, 
+	        b.board_description, 
+	        b.board_reg_date, 
+	        b.user_pk,
+	        u.user_name  <!-- 🔹 user_name 추가 -->
+	    FROM board b
+	    INNER JOIN user u ON b.user_pk = u.user_pk  <!-- 🔹 user 테이블과 조인 -->
+	    WHERE 1=1
+	    <if test="searchKeyword != null and searchKeyword != ''">
+	        <choose>
+	            <when test="searchCondition == 0">
+	                AND b.board_title LIKE CONCAT('%', #{searchKeyword}, '%')
+	            </when>
+	            <when test="searchCondition == 1">
+	                AND b.board_description LIKE CONCAT('%', #{searchKeyword}, '%')
+	            </when>
+	        </choose>
+	    </if>
+	    ORDER BY b.board_pk DESC
+	    LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
+	</select>
+
+
+    <!-- 게시글 총 개수 조회 -->
+    <select id="selectBoardListTotCnt" parameterType="egovframework.vo.BoardVO" resultType="int">
+        SELECT COUNT(*) AS totcnt
+        FROM board
+        WHERE 1=1
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <choose>
+                <when test="searchCondition == 0">
+                    AND board_title LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+                <when test="searchCondition == 1">
+                    AND board_description LIKE CONCAT('%', #{searchKeyword}, '%')
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

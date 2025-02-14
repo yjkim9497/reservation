@@ -14,4 +14,5 @@ public interface ReserveService {
     void cancelReservation(Long id, int numberOfPeople);
     void deleteReservation(Long id);
     List<ReserveVO> getAllReservations();
+	ReserveVO bookReservation(ReserveVO reserveVO);
 }

@@ -1,8 +1,7 @@
 package egovframework.vo;
 
 public enum ReserveStatus {
-	AVAILABLE, // 예약가능
-	PROGRESSING, // 예약중
-	CANCELED, // 예약취소
+	APPLYING, // 예약신청
+	PROGRESSING, // 예약진행중
 	COMPLETED // 예약완료
 }

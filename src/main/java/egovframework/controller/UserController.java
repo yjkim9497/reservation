@@ -40,21 +40,23 @@ public class UserController {
     }
 
     // 회원가입 처리
-    @RequestMapping(value = "/actionSignup.do", method = RequestMethod.POST)
+    @RequestMapping(value = "actionSignup.do", method = RequestMethod.POST)
     public String registerUser(@ModelAttribute("userVO") UserVO userVO, HttpServletRequest request, Model model) throws Exception {
     	// 암호화 로직 추가
-    	String hashedPassword = egovPasswordEncoder.encryptPassword(userVO.getPassword());
-        userVO.setPassword(hashedPassword);
+    	System.out.println("회원가입 컨트롤러");
+    	String hashedPassword = egovPasswordEncoder.encryptPassword(userVO.getUserPassword());
+//    	System.out.println("비밀번호"+hashedPassword);
+        userVO.setUserPassword(hashedPassword);
         
-        String encryptedPhone = cryptoService.encrypt(userVO.getPhone());
-        String encryptedEmail = cryptoService.encrypt(userVO.getEmail());
+        String encryptedPhone = cryptoService.encrypt(userVO.getUserPhone());
+        String encryptedEmail = cryptoService.encrypt(userVO.getUserEmail());
 
         // 암호화된 데이터로 UserVO 업데이트
-        userVO.setPhone(encryptedPhone);
-        userVO.setEmail(encryptedEmail);
+        userVO.setUserPhone(encryptedPhone);
+        userVO.setUserEmail(encryptedEmail);
 
         
-        System.out.println("컨트롤단 생년월일"+userVO.getBirth());
+        System.out.println("컨트롤단 생년월일"+userVO.getUserBirth());
         
         userService.registerUser(userVO);
         model.addAttribute("message", "회원가입이 완료되었습니다.");
@@ -80,9 +82,9 @@ public class UserController {
     public String myPage(HttpServletRequest request, Model model) {
         // 세션에서 사용자 정보 가져오기
         LoginVO resultVO = (LoginVO) request.getSession().getAttribute("LoginVO");
-        String userId = resultVO.getId();
+        String userId = resultVO.getUserId();
         
-        if (resultVO == null || resultVO.getId() == null) {
+        if (resultVO == null || resultVO.getUserId() == null) {
         	// 세션이 없으면 로그인 페이지로 리다이렉트
         	System.out.println("세션에 로그인한 유저가 존재하지 않음");
         	return "redirect:/login.do";
@@ -92,12 +94,12 @@ public class UserController {
         
         try {
             // 복호화 처리
-            String decryptedEmail = cryptoService.decrypt(loginUser.getEmail());
-            String decryptedPhone = cryptoService.decrypt(loginUser.getPhone());
+            String decryptedEmail = cryptoService.decrypt(loginUser.getUserEmail());
+            String decryptedPhone = cryptoService.decrypt(loginUser.getUserPhone());
 
             // 복호화된 데이터로 업데이트
-            loginUser.setEmail(decryptedEmail);
-            loginUser.setPhone(decryptedPhone);
+            loginUser.setUserEmail(decryptedEmail);
+            loginUser.setUserPhone(decryptedPhone);
         } catch (Exception e) {
             // 복호화 실패 시 로그 출력 및 에러 처리
             System.out.println("복호화 중 오류 발생: " + e.getMessage());

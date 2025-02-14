@@ -11,6 +11,10 @@ import egovframework.vo.ReserveVO;
 
 @Mapper
 public interface ReserveMapper {
+	
+	void insertReservation(ReserveVO reserveVO);
+	
+	
 	// 날짜로 예약 목록 조회
     List<ReserveVO> findByDate(@Param("date") LocalDate date);
 

@@ -16,7 +16,7 @@
                     <a class="nav-link" href="/test1/reservation.do">예약하기</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/test1/egovSampleList.do">질문게시판</a>
+                    <a class="nav-link" href="/test1/boardList.do">질문게시판</a>
                 </li>
             </ul>
             <c:if test="${sessionScope.LoginVO == null}">
@@ -28,7 +28,7 @@
             </c:if>
             <c:if test="${sessionScope.LoginVO != null}">
                 <ul class="navbar-nav">
-	                <c:if test="${sessionScope.LoginVO.role eq 'admin'}">
+	                <c:if test="${sessionScope.LoginVO.userRole eq 'ADMIN'}">
 	                	<li class="nav-item">
 	                        <a class="nav-link" href="/test1/admin.do">관리자페이지</a>
 	                    </li>

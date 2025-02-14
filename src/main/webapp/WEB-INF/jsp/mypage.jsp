@@ -17,28 +17,28 @@
         <h1 class="mt-5">마이페이지</h1>
         <div class="card mt-4">
             <div class="card-body">
-                <h2>${loginUser.name}님, 환영합니다!</h2>
+                <h2>${loginUser.userName}님, 환영합니다!</h2>
                 <table class="table">
                     <tbody>
                         <tr>
                             <th scope="row">아이디</th>
-                            <td>${loginUser.id}</td>
+                            <td>${loginUser.userId}</td>
                         </tr>
                         <tr>
                             <th scope="row">이메일</th>
-                            <td>${loginUser.email}</td>
+                            <td>${loginUser.userEmail}</td>
                         </tr>
                         <tr>
                             <th scope="row">연락처</th>
-                            <td>${loginUser.phone}</td>
+                            <td>${loginUser.userPhone}</td>
                         </tr>
                         <tr>
                             <th scope="row">역할</th>
-                            <td>${loginUser.role}</td>
+                            <td>${loginUser.userRole}</td>
                         </tr>
                         <tr>
                             <th scope="row">생년월일</th>
-                            <td><fmt:formatDate value="${loginUser.birth}" pattern="yyyy년MM월dd일" /></td>
+                            <td><fmt:formatDate value="${loginUser.userBirth}" pattern="yyyy년MM월dd일" /></td>
                         </tr>
                     </tbody>
                 </table>

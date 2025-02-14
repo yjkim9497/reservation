@@ -1,27 +1,35 @@
 package egovframework.vo;
 
 public class LoginVO {
-	private String id;       // 사용자 ID
-    private String password; // 비밀번호
-    private String role;
+	private Long userPk;
+	private String userId;       // 사용자 ID
+    private String userPassword; // 비밀번호
+    private String userRole;
     
-	public String getRole() {
-		return role;
+	public Long getUserPk() {
+		return userPk;
 	}
-	public void setRole(String role) {
-		this.role = role;
+	public void setUserPk(Long userPk) {
+		this.userPk = userPk;
 	}
-	public String getId() {
-		return id;
+	public String getUserId() {
+		return userId;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
-	public String getPassword() {
-		return password;
+	public String getUserPassword() {
+		return userPassword;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setUserPassword(String userPassword) {
+		this.userPassword = userPassword;
+	}
+	public String getUserRole() {
+		return userRole;
+	}
+	public void setUserRole(String userRole) {
+		this.userRole = userRole;
 	}
     
+
 }

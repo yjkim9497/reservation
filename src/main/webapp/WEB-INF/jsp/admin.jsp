@@ -22,7 +22,7 @@
                 <a class="nav-link active" id="userTab" data-bs-toggle="tab" href="#users">유저 관리</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="reservationTab" data-bs-toggle="tab" href="#reservations">예약 관리</a>
+                <a class="nav-link" id="reservationTab" data-bs-toggle="tab" href="#reservations">세미나 관리</a>
             </li>
         </ul>
 
@@ -44,19 +44,19 @@
                     <tbody>
                         <c:forEach var="user" items="${users}">
                             <tr>
-                                <td>${user.id}</td>
-                                <td>${user.name}</td>
-                                <td>${user.email}</td>
-                                <td>${user.phone}</td>
-                                <td><fmt:formatDate value="${user.birth}" pattern="yyyy년 MM월 dd일" /></td>
+                                <td>${user.userId}</td>
+                                <td>${user.userName}</td>
+                                <td>${user.userEmail}</td>
+                                <td>${user.userPhone}</td>
+                                <td><fmt:formatDate value="${user.userBirth}" pattern="yyyy년 MM월 dd일" /></td>
                                 <td>${user.regDateFormatted}</td>
                                 <td>
                                     <form action="editUser.do" method="get" style="display: inline;">
-                                        <input type="hidden" name="id" value="${user.id}">
+                                        <input type="hidden" name="id" value="${user.userId}">
                                         <button type="submit" class="btn btn-primary btn-sm">수정</button>
                                     </form>
                                     <form action="deleteUser.do" method="post" style="display: inline;" onsubmit="return confirmDelete();">
-                                        <input type="hidden" name="id" value="${user.id}">
+                                        <input type="hidden" name="id" value="${user.userId}">
                                         <button type="submit" class="btn btn-danger btn-sm">삭제</button>
                                     </form>
                                 </td>
@@ -68,31 +68,35 @@
 
             <!-- 예약 관리 탭 -->
             <div class="tab-pane fade" id="reservations">
-                <h2 class="mb-4">예약 목록</h2>
-                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addReservationModal">예약 추가</button>
+                <h2 class="mb-4">세미나 목록</h2>
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addReservationModal">세미나 추가</button>
                 <%-- <c:if test="${not empty loginUser}">
                     <p>현재 로그인한 사용자: <strong>${loginUser.name}</strong> (${loginUser.role})</p>
                 </c:if> --%>
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>NO</th>
                             <th>날짜</th>
-                            <th>예약 시간</th>
+                            <th>이름</th>
+                            <th>시간</th>
+                            <th>예약인원</th>
                             <th>상태</th>
                             <th>관리</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="reservation" items="${reservations}">
+                        <c:forEach var="seminar" items="${seminars}">
                             <tr>
-                                <td>${reservation.id}</td>
-                                <td>${reservation.date}</td>
-                                <td>${reservation.timeSlot}</td>
-                                <td>${reservation.status}</td>
+                                <td>${seminar.seminarPk}</td>
+                                <td>${seminar.seminarDate}</td>
+                                <td>${seminar.seminarName}</td>
+                                <td>${seminar.seminarTimeSlot}</td>
+                                <td>${seminar.seminarCurrentPeople} / ${seminar.seminarCapacity}</td>
+                                <td>${seminar.seminarStatus}</td>
                                 <td>
-                                    <c:if test="${reservation.status == 'PROGRESSING' and loginUser.role == 'admin'}">
-                                        <button class="btn btn-success btn-sm" onclick="approveReservation('${reservation.id}')">승인</button>
+                                    <c:if test="${seminar.seminarStatus == 'PROGRESSING' and loginUser.userRole == 'ADMIN'}">
+                                        <button class="btn btn-success btn-sm" onclick="approveReservation('${reservation.reservationId}')">승인</button>
                                     </c:if>
                                 </td>
                             </tr>
@@ -107,22 +111,29 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addReservationModalLabel">예약 추가</h5>
+                    <h5 class="modal-title" id="addReservationModalLabel">세미나 추가</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="addReservationForm">
                         <div class="mb-3">
-                            <label for="reservationDate" class="form-label">예약 날짜</label>
-                            <input type="date" class="form-control" id="reservationDate" required>
+                            <label for="seminarDate" class="form-label">세미나 날짜</label>
+                            <input type="date" class="form-control" id="seminarDate" required>
                         </div>
                         <div class="mb-3">
-                            <label for="timeSlot" class="form-label">예약 시간</label>
-                            <select class="form-control" id="timeSlot" required>
-                                <option value="09:00 - 10:00">09:00 - 10:00</option>
-                                <option value="10:00 - 11:00">10:00 - 11:00</option>
-                                <option value="11:00 - 12:00">11:00 - 12:00</option>
+                            <label for="seminarName" class="form-label">세미나 이름</label>
+                            <input type="text" class="form-control" id="seminarName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="seminarTimeSlot" class="form-label">세미나 시간</label>
+                            <select class="form-control" id="seminarTimeSlot" required>
+                                <option value="am">오전</option>
+                                <option value="pm">오후</option>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="seminarCapacity" class="form-label">세미나 정원</label>
+                            <input type="text" class="form-control" id="seminarCapacity" required>
                         </div>
                         <button type="submit" class="btn btn-primary">예약 추가</button>
                     </form>
@@ -147,14 +158,16 @@
         
         document.getElementById("addReservationForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            let date = document.getElementById("reservationDate").value;
-            let time = document.getElementById("timeSlot").value;
+            let date = document.getElementById("seminarDate").value;
+            let name = document.getElementById("seminarName").value;
+            let time = document.getElementById("seminarTimeSlot").value;
+            let capacity = document.getElementById("seminarCapacity").value;
             console.log(date)
             console.log(time)
-            fetch('/test1/reservation/add.do', {
+            fetch('/test1/seminar/add.do', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ "date": date, "timeSlot": time })
+                body: JSON.stringify({ "seminarDate": date, "seminarName": name, "seminarTimeSlot" : time, "seminarCapacity" : capacity })
             }).then(response => response.text())
             .then(data => {
                 alert("예약이 추가되었습니다.");

@@ -2,68 +2,89 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="egovframework.mapper.UserMapper">
 
+    <!-- UserVO 매핑 -->
     <resultMap id="user" type="egovframework.vo.UserVO">
-        <result property="id" column="id"/>
-        <result property="password" column="password"/>
-        <result property="role" column="role"/>
-        <result property="name" column="name"/>
-        <result property="email" column="email"/>
-        <result property="phone" column="phone"/>
-        <result property="birth" column="birth"/>
-        <result property="regDate" column="reg_date"/>
+        <result property="userPk" column="user_pk"/>
+        <result property="userId" column="user_id"/>
+        <result property="userPassword" column="user_password"/>
+        <result property="userRole" column="user_role" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name"/>
+        <result property="userEmail" column="user_email"/>
+        <result property="userPhone" column="user_phone"/>
+        <result property="userBirth" column="user_birth"/>
+        <result property="userRegDate" column="user_reg_date"/>
+        <result property="userLock" column="user_lock"/>
+        <result property="userLockCount" column="user_lock_count"/>
     </resultMap>
-    
+
+    <!-- LoginVO 매핑 -->
     <resultMap id="login" type="egovframework.vo.LoginVO">
-    	<result property="id" column="id"/>
-        <result property="password" column="password"/>
-        <result property="role" column="role"/>
+        <result property="userId" column="user_id"/>
+        <result property="userPassword" column="user_password"/>
+        <result property="userRole" column="user_role" jdbcType="VARCHAR"/>
+        <result property="userPk" column="user_pk"/>
     </resultMap>
 
     <!-- 회원가입 -->
     <insert id="insertUser" parameterType="egovframework.vo.UserVO">
-        INSERT INTO USER (ID, PASSWORD, ROLE, NAME, EMAIL, PHONE, BIRTH, REG_DATE)
-        VALUES (#{id}, #{password}, #{role}, #{name}, #{email}, #{phone}, #{birth} , NOW())
+        INSERT INTO user (user_id, user_password, user_role, user_name, user_email, user_phone, user_birth, user_reg_date, user_lock, user_lock_count)
+        VALUES (#{userId}, #{userPassword}, #{userRole}, #{userName}, #{userEmail}, #{userPhone}, #{userBirth}, NOW(), false, 0)
     </insert>
-    
+
+    <!-- 로그인 -->
     <select id="actionLogin" resultMap="login">
-            SELECT ID AS id
-                 , PASSWORD AS password
-                 , ROLE AS role
-              FROM USER 
-        	  WHERE ID = #{id} AND PASSWORD = #{password}
-	</select>
+        SELECT user_id, user_password, user_role, user_pk
+        FROM user 
+        WHERE user_id = #{userId} AND user_password = #{userPassword}
+    </select>
 
     <!-- 회원 정보 조회 -->
-    <select id="selectUser"  parameterType="string" resultMap="user">
-        SELECT ID, PASSWORD, ROLE, NAME, EMAIL, PHONE, BIRTH, REG_DATE 
-        FROM USER 
-        WHERE ID = #{id}
+    <select id="selectUser" parameterType="string" resultMap="user">
+        SELECT user_pk, user_id, user_password, user_role, user_name, user_email, user_phone, user_birth, user_reg_date, user_lock, user_lock_count
+        FROM user 
+        WHERE user_id = #{userId}
     </select>
-    
+
+    <!-- 전체 회원 조회 -->
     <select id="selectAllUsers" resultMap="user">
-    	SELECT * FROM USER; <!-- 테이블 이름은 실제 테이블명으로 변경 -->
-	</select>
-	
-	<!-- 사용자 삭제 -->
+        SELECT user_pk, user_id, user_password, user_role, user_name, user_email, user_phone, user_birth, user_reg_date, user_lock, user_lock_count
+        FROM user
+    </select>
+
+    <!-- 사용자 삭제 -->
     <delete id="deleteUser" parameterType="string">
-        DELETE FROM USER WHERE id = #{id}
+        DELETE FROM user WHERE user_id = #{userId}
     </delete>
 
-    <!-- 사용자 수정 -->
+    <!-- 사용자 정보 수정 -->
     <update id="updateUser" parameterType="egovframework.vo.UserVO">
-        UPDATE USER
-        SET password = #{password},
-            role = #{role},
-            name = #{name},
-            email = #{email},
-            phone = #{phone},
-            birth = #{birth},
-            reg_date = #{regDate}
-        WHERE id = #{id}
+        UPDATE user
+        SET user_password = #{userPassword},
+            user_role = #{userRole, jdbcType=VARCHAR},
+            user_name = #{userName},
+            user_email = #{userEmail},
+            user_phone = #{userPhone},
+            user_birth = #{userBirth}
+        WHERE user_id = #{userId}
     </update>
-    
+
+    <!-- 아이디 중복 확인 -->
     <select id="countById" resultType="int">
-    	SELECT COUNT(*) FROM user WHERE id = #{id}
-	</select>
+        SELECT COUNT(*) FROM user WHERE user_id = #{userId}
+    </select>
+
+    <!-- 사용자 계정 잠금 상태 업데이트 -->
+    <update id="updateUserLock" parameterType="map">
+        UPDATE user
+        SET user_lock = #{userLock}, user_lock_count = #{userLockCount}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 사용자 계정 잠금 해제 (초기화) -->
+    <update id="resetUserLock" parameterType="string">
+        UPDATE user
+        SET user_lock = false, user_lock_count = 0
+        WHERE user_id = #{userId}
+    </update>
 
 </mapper>

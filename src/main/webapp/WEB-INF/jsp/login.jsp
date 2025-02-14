@@ -82,10 +82,10 @@ body {
 <script type="text/javascript">
     function actionLogin() {
 
-        if (document.loginForm.id.value == "") {
+        if (document.loginForm.userId.value == "") {
             alert("아이디를 입력하세요");
             return false;
-        } else if (document.loginForm.password.value == "") {
+        } else if (document.loginForm.userPassword.value == "") {
             alert("비밀번호를 입력하세요");
             return false;
         } else {
@@ -149,11 +149,11 @@ body {
                 <h1>로그인</h1>
                 <form:form name="loginForm" method="post" action="actionLogin">
                     <label for="id">아이디</label>
-                    <input type="text" id="id" name="id" maxlength="10"
+                    <input type="text" id="userId" name="userId" maxlength="10"
                         placeholder="아이디를 입력하세요" />
 
                     <label for="password">비밀번호</label>
-                    <input type="password" id="password" name="password"
+                    <input type="password" id="userPassword" name="userPassword"
                         maxlength="25" placeholder="비밀번호를 입력하세요"
                         onkeydown="if (event.keyCode === 13) actionLogin();" />
 

@@ -71,51 +71,67 @@ public class ReserveController {
 	    }
 	}
 
-	// 예약 신청 (사용자가 예약 요청)
-    @RequestMapping(value = "/{id}/book.do", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseEntity<String> bookReservation(@PathVariable Long id, HttpServletRequest request) {
-    	Long userId = (Long) request.getSession().getAttribute("userId");
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+	@RequestMapping(value = "/{seminarPk}/book.do", method = RequestMethod.POST)
+	@ResponseBody
+    public Map<String, Object> bookReservation(
+            @PathVariable("seminarPk") Long seminarPk,
+            @RequestBody ReserveVO reserveVO, HttpServletRequest request) {
+        System.out.println("예약요청" + seminarPk);
+        Map<String, Object> response = new HashMap<>();
+        try {
+        	LoginVO loginUser = (LoginVO) request.getSession().getAttribute("LoginVO");
+        	System.out.println("로그인 유저 확인"+loginUser.getUserRole());
+        	if(loginUser != null) {
+        		Long userPk = loginUser.getUserPk();
+        		reserveVO.setUserPk(userPk);
+        		reserveVO.setReservationLogin(true);
+        	}else {
+        		reserveVO.setReservationLogin(false);
+        	}
+        	reserveVO.setSeminarPk(seminarPk);
+        	System.out.println("컨트롤러 확인"+reserveVO.getReservationEmail());
+        	reserveService.bookReservation(reserveVO);
+            response.put("message", "예약이 완료되었습니다!");
+            response.put("status", "success");
+        } catch (Exception e) {
+            response.put("message", "예약 중 오류가 발생했습니다.");
+            response.put("status", "error");
         }
-    	reserveService.bookReservation(id, userId);
-    	System.out.println("예약성공");
-        return ResponseEntity.ok("예약신청이 완료되었습니다.");
+        return response;
     }
 	
     // 예약 승인 (관리자가 예약 승인)
- 	@RequestMapping(value = "/{id}/approve.do", method = RequestMethod.POST)
- 	@ResponseBody
- 	public ResponseEntity<String> approveReservation(@PathVariable String id, HttpServletRequest request) {
- 		LoginVO user = (LoginVO) request.getSession().getAttribute("LoginVO");
- 		
- 	// 로그인 여부 확인
-        if (user == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
-        }
-
-        // 관리자 권한 체크
-        if (!"admin".equals(user.getRole())) {
-            return ResponseEntity.status(403).body("관리자 권한이 필요합니다.");
-        }
- 		
- 		reserveService.approveReservation(id);
- 	    return ResponseEntity.ok("예약이 승인되었습니다.");
- 	}
+// 	@RequestMapping(value = "/{id}/approve.do", method = RequestMethod.POST)
+// 	@ResponseBody
+// 	public ResponseEntity<String> approveReservation(@PathVariable String id, HttpServletRequest request) {
+// 		LoginVO user = (LoginVO) request.getSession().getAttribute("LoginVO");
+// 		
+// 	// 로그인 여부 확인
+//        if (user == null) {
+//            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+//        }
+//
+//        // 관리자 권한 체크
+//        if (!"admin".equals(user.getRole())) {
+//            return ResponseEntity.status(403).body("관리자 권한이 필요합니다.");
+//        }
+// 		
+// 		reserveService.approveReservation(id);
+// 	    return ResponseEntity.ok("예약이 승인되었습니다.");
+// 	}
 
  	// 예약 리스트 조회 (JSP 페이지)
  	@RequestMapping(value = "/list.do", method = RequestMethod.GET)
  	public String reservationList(HttpServletRequest request, Model model) {
  	    LoginVO resultVO = (LoginVO) request.getSession().getAttribute("LoginVO");
 
- 	    if (resultVO == null || resultVO.getId() == null) {
+ 	    if (resultVO == null || resultVO.getUserId() == null) {
  	        // 세션이 없으면 로그인 페이지로 리다이렉트
  	        System.out.println("세션에 로그인한 유저가 존재하지 않음");
  	        return "redirect:/login.do";
  	    }
 
- 	    String userId = resultVO.getId();
+ 	    String userId = resultVO.getUserId();
  	    UserVO loginUser = userService.getUser(userId);
  
  	    if (loginUser == null) {

@@ -37,13 +37,13 @@ public class LoginServiceImpl extends EgovAbstractServiceImpl implements LoginSe
 		if (loginVO == null) {
 		    System.out.println("loginVO가 null입니다. DAO에서 데이터를 조회하지 못했습니다.");
 		} else {
-		    System.out.println("서비스 로그인 dao" + loginVO.getId());
+		    System.out.println("서비스 로그인 dao" + loginVO.getUserId());
 		}
 		
-		System.out.println("서비스 로그인 vo의 role : "+loginVO.getRole());
+		System.out.println("서비스 로그인 vo의 role : "+loginVO.getUserRole());
 
 		// 3. 결과를 리턴한다.
-		if (loginVO != null && !loginVO.getId().equals("") && !loginVO.getPassword().equals("")) {
+		if (loginVO != null && !loginVO.getUserId().equals("") && !loginVO.getUserPassword().equals("")) {
 			return loginVO;
 		} else {
 			loginVO = new LoginVO();

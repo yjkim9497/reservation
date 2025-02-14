@@ -5,19 +5,29 @@
 <mapper namespace="egovframework.mapper.ReserveMapper">
 
 	<resultMap id="ReserveResultMap" type="egovframework.vo.ReserveVO">
-        <result column="id" property="id"/>
-        <result column="user_name" property="userName"/>
-        <result column="reservation_time" property="reservationTime"/>
-        <result column="date" property="date"/>
-        <result column="time_slot" property="timeSlot"/>
-        <result column="phone" property="phone"/>
-        <result column="email" property="email"/>
-        <result column="birthdate" property="birthdate"/>
-        <result column="number_of_people" property="numberOfPeople"/>
-        <result column="max_capacity" property="maxCapacity"/>
-        <result column="status" property="status"/>
-        <result column="user_id" property="userId"/>
+	    <result column="reservation_pk" property="reservationPk"/>
+	    <result column="reservation_name" property="reservationName"/>
+	    <result column="reservation_phone" property="reservationPhone"/>
+	    <result column="reservation_email" property="reservationEmail"/>
+	    <result column="reservation_birth" property="reservationBirth"/>
+	    <result column="reservation_number" property="reservationNumber"/>
+	    <result column="reservation_status" property="reservationStatus"/>
+	    <result column="reservation_time" property="reservationTime"/>
+	    <result column="user_pk" property="userPk"/>
+	    <result column="seminar_pk" property="seminarPk"/>
     </resultMap>
+    
+    <insert id="insertReservation" >
+        INSERT INTO reservation (
+            reservation_name, reservation_phone, reservation_email, reservation_birth,
+            reservation_number, reservation_login, reservation_status, reservation_time,
+            user_pk, seminar_pk
+        ) VALUES (
+            #{reservationName}, #{reservationPhone}, #{reservationEmail}, #{reservationBirth},
+            #{reservationNumber}, #{reservationLogin}, 'PROGRESSING', NOW(),
+            #{userPk}, #{seminarPk}
+        )
+    </insert>
     
     <!-- 날짜로 예약 목록 조회 -->
     <select id="findByDate" parameterType="java.time.LocalDate" resultMap="ReserveResultMap">
@@ -85,11 +95,11 @@
     </insert>
 
     <!-- 예약 인원 증가 (예약 승인 시) -->
-    <update id="increaseReservationCount">
+<!--     <update id="increaseReservationCount">
         UPDATE reservations
         SET number_of_people = number_of_people + #{numberOfPeople}
         WHERE id = #{id} AND number_of_people + #{numberOfPeople} <= max_capacity
-    </update>
+    </update> -->
 
     <!-- 예약 인원 감소 (예약 취소 시) -->
     <update id="decreaseReservationCount">

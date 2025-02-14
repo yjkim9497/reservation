@@ -34,7 +34,7 @@ public class AdminController {
 		LoginVO sessionUser = (LoginVO) request.getSession().getAttribute("LoginVO");
 
         // 로그인한 사용자가 없거나 role이 admin이 아닌 경우
-        if (sessionUser == null || !"admin".equals(sessionUser.getRole())) {
+        if (sessionUser == null || !"ADMIN".equals(sessionUser.getUserRole())) {
             // 접근을 차단하거나 다른 페이지로 리다이렉트
             return "redirect:/accessDenied.do"; // 접근 권한 없을 때 이동할 페이지
         }
