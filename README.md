@@ -39,7 +39,10 @@
 - 세미나 목록
   <br>
   ![image](https://github.com/user-attachments/assets/a5cc4c28-3e81-480d-aa23-694600c6ec2a)
+- 세미나 예약
+  <br>
   ![image](https://github.com/user-attachments/assets/5b220cd6-7fd2-48ad-ab58-4d131c8cb37e)
+- 세미나 상세
 
  
 ### 4️⃣ 프로젝트 구조
