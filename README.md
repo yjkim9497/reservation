@@ -43,6 +43,7 @@
   <br>
   ![image](https://github.com/user-attachments/assets/5b220cd6-7fd2-48ad-ab58-4d131c8cb37e)
 - 세미나 상세
+![image](https://github.com/user-attachments/assets/ae9ca1ff-0910-4f87-af17-591f60147d46)
 
  
 ### 4️⃣ 프로젝트 구조
