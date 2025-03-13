@@ -3,13 +3,13 @@
 - 1인 프로젝트 
 
 ## 📌 프로젝트 개요
-COMIN Developer 프로젝트는 **세미나 예약 시스템**을 개발하는 과정에서 서버 구성, 프로그래밍, 데이터 암호화 등의 기술을 적용한 프로젝트입니다. 본 리포지토리는 프로젝트의 주요 기능 및 기술 스택을 정리한 문서입니다.
+**세미나 예약 시스템**을 개발하는 과정에서 서버 구성, 프로그래밍, 데이터 암호화 등의 기술을 적용한 프로젝트입니다. 본 리포지토리는 프로젝트의 주요 기능 및 기술 스택을 정리한 문서입니다.
 
 ## 🛠 기술 스택
-- **Back-End**: Java, Spring Framework, MyBatis
+- **Back-End**: Java 1.8, 전자정부프레임워크(Spring Framework) 4.2, MyBatis
 - **Front-End**: HTML, CSS, JavaScript
-- **Database**: MySQL
-- **Infra**: Apache, Tomcat, Virtual Machine (VM)
+- **Database**: MariaDB
+- **Infra**: Virtual Machine (VM), Rocky Linux 8.10
 - **Security**: SHA-256 암호화
 
 ## ⚙ 프로젝트 구성
@@ -17,7 +17,7 @@ COMIN Developer 프로젝트는 **세미나 예약 시스템**을 개발하는 �
 - **OS**: Linux 기반 환경 구축
 - **Web Server**: Apache 설정 및 가상 호스트 적용
 - **WAS**: Tomcat 연동 및 설정 파일 적용
-- **DB**: MySQL 실행 및 설정
+- **DB**: MariaDB 실행 및 설정
 
 ### 2️⃣ 주요 기능
 #### ✅ 사용자 기능
