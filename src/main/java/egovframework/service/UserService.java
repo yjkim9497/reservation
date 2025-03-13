@@ -4,14 +4,37 @@ import java.util.List;
 
 import egovframework.vo.UserVO;
 
+
 public interface UserService {
+	
+	
+	/**
+	 * @param userVO
+	 */
 	void registerUser(UserVO userVO);  // 회원가입
-    UserVO getUser(String id); 
+    /**
+     * @param userPk
+     * @return
+     */
+    UserVO getUser(Long userPk); 
     
+    /**
+     * @return
+     */
     List<UserVO> getAllUsers();
     
-    void deleteUser(String id); // 삭제 메서드
+    /**
+     * @param userPk
+     */
+    void deleteUser(Long userPk); // 삭제 메서드
+    /**
+     * @param user
+     */
     void updateUser(UserVO user); // 수정 메서드
     
+    /**
+     * @param id
+     * @return
+     */
     boolean isDuplicateId(String id);
 }

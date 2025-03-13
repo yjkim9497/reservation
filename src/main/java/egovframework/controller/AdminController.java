@@ -12,11 +12,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import egovframework.mapper.UserMapper;
 import egovframework.service.ReserveService;
+import egovframework.service.SeminarService;
 import egovframework.service.UserService;
 import egovframework.vo.LoginVO;
-import egovframework.vo.ReserveVO;
+import egovframework.vo.SeminarVO;
+import egovframework.vo.UserRole;
 import egovframework.vo.UserVO;
 
 @Controller
@@ -26,41 +30,94 @@ public class AdminController {
 	private UserService userService;
 	
 	@Autowired
+	private UserMapper userMapper;
+	
+	@Autowired
 	private ReserveService reserveService;
+	
+	@Autowired
+	private SeminarService seminarService;
+	
+//	@RequestMapping(value = "admin.do")
+//	public String adminPage() {
+//		return "admin";
+//	}
+//	
+//	@RequestMapping(value = "adminSeminar.do")
+//	public String adminSeminarPage() {
+//		return "adminSeminar";
+//	}
 	
 	@RequestMapping(value = "admin.do")
     public String adminPage(HttpServletRequest request,HttpSession session, Model model) {
         // 세션에서 로그인 정보 가져오기
-		LoginVO sessionUser = (LoginVO) request.getSession().getAttribute("LoginVO");
+		UserVO sessionUser = (UserVO) request.getSession().getAttribute("LoginVO");
 
         // 로그인한 사용자가 없거나 role이 admin이 아닌 경우
-        if (sessionUser == null || !"ADMIN".equals(sessionUser.getUserRole())) {
+        if (sessionUser == null || !UserRole.ADMIN.equals(sessionUser.getUserRole())) {
             // 접근을 차단하거나 다른 페이지로 리다이렉트
             return "redirect:/accessDenied.do"; // 접근 권한 없을 때 이동할 페이지
         }
-//        String userId = sessionUser.getId();
-//        UserVO loginUser = userService.getUser(userId);
         
         List<UserVO> users = userService.getAllUsers();
         
-     // 예약 목록 가져오기
-        List<ReserveVO> reservations;
+        List<SeminarVO> seminars;
+        
         try {
-            reservations = reserveService.getAllReservations();
+        	seminars = seminarService.getAllSeminars();
         } catch (Exception e) {
-            System.err.println("예약 목록 조회 중 오류 발생: " + e.getMessage());
-            reservations = Collections.emptyList();
+        	seminars = Collections.emptyList();
         }
 
         model.addAttribute("loginUser", sessionUser);
         model.addAttribute("users", users);
-        model.addAttribute("reservations", reservations);
-		System.out.println("관리자 컨트롤"+users.toString());
-//        model.addAttribute("users", users);
+        model.addAttribute("seminars", seminars);
 
         // role이 admin인 경우에만 admin 페이지 반환
         return "admin";
     }
+	
+	@RequestMapping(value = "adminSeminar.do")
+	public String adminSeminarPage(HttpServletRequest request,HttpSession session, Model model) {
+		// 세션에서 로그인 정보 가져오기
+		UserVO sessionUser = (UserVO) request.getSession().getAttribute("LoginVO");
+		
+		// 로그인한 사용자가 없거나 role이 admin이 아닌 경우
+		if (sessionUser == null || !UserRole.ADMIN.equals(sessionUser.getUserRole())) {
+			// 접근을 차단하거나 다른 페이지로 리다이렉트
+			return "redirect:/accessDenied.do"; // 접근 권한 없을 때 이동할 페이지
+		}
+		List<SeminarVO> seminars;
+		try {
+			seminars = seminarService.getAllSeminars();
+		} catch (Exception e) {
+			seminars = Collections.emptyList();
+		}
+		model.addAttribute("seminars", seminars);
+		
+		// role이 admin인 경우에만 admin 페이지 반환
+		return "adminSeminar";
+	}
+	
+	@RequestMapping(value = "adminHoliday.do")
+	public String adminHolidayPage(HttpServletRequest request,HttpSession session) {
+		UserVO sessionUser = (UserVO) request.getSession().getAttribute("LoginVO");
+		
+		// 로그인한 사용자가 없거나 role이 admin이 아닌 경우
+		if (sessionUser == null || !UserRole.ADMIN.equals(sessionUser.getUserRole())) {
+			// 접근을 차단하거나 다른 페이지로 리다이렉트
+			return "redirect:/accessDenied.do"; // 접근 권한 없을 때 이동할 페이지
+		}
+		return "adminHoliday";
+	}
+	
+	@RequestMapping(value = "/unlockUser.do", method = RequestMethod.POST)
+	public String unlockUser(@RequestParam("userPk") Long userPk, RedirectAttributes redirectAttributes) {
+	    userMapper.unlockUserAccount(userPk);
+	    redirectAttributes.addFlashAttribute("message", "사용자 계정이 잠금 해제되었습니다.");
+	    return "redirect:/admin.do";
+	}
+	
 	
 	@RequestMapping(value = "accessDenied.do")
 	public String accessDenied() {
@@ -68,22 +125,21 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "users.do")
-    public String getAllUsers(Model model) {
+    public final String getAllUsers(Model model) {
 		List<UserVO> users = userService.getAllUsers();
-		System.out.println("관리자 컨트롤"+users.toString());
         model.addAttribute("users", users);
         return "admin";
     }
 	
 	@RequestMapping(value = "deleteUser.do", method = RequestMethod.POST)
-	public String deleteUser(@RequestParam("id") String id) {
-	    userService.deleteUser(id);
-	    return "redirect:users.do"; // 삭제 후 목록 페이지로 리다이렉트
+	public String deleteUser(@RequestParam("id") Long userPk) {
+	    userService.deleteUser(userPk);
+	    return "redirect:admin.do"; // 삭제 후 목록 페이지로 리다이렉트
 	}
 
 	@RequestMapping(value = "editUser.do")
-	public String editUser(@RequestParam("id") String id, Model model) {
-	    UserVO user = userService.getUser(id);
+	public String editUser(@RequestParam("id") Long userPk, Model model) {
+	    UserVO user = userService.getUser(userPk);
 	    model.addAttribute("user", user);
 	    return "admin/editUser"; // editUser.jsp로 이동
 	}

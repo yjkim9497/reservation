@@ -1,21 +1,32 @@
 package egovframework.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.egovframe.rte.fdl.cryptography.EgovEnvCryptoService;
 import org.egovframe.rte.fdl.cryptography.EgovPasswordEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.egovframe.rte.fdl.string.EgovStringUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import egovframework.mapper.UserMapper;
+import egovframework.rte.fdl.string.EgovStringUtil;
 import egovframework.service.LoginService;
 import egovframework.vo.LoginVO;
+import egovframework.vo.UserVO;
 
 @Controller
 public class LoginController {
@@ -23,30 +34,15 @@ public class LoginController {
 	@Resource(name = "loginService")
 	private LoginService loginService;
 	
-	 @Resource(name = "egovEnvPasswordEncoderService")
-	    EgovPasswordEncoder egovPasswordEncoder;
+	@Resource
+	private UserMapper userMapper;
 	
-	// 로그인 페이지로 이동
-//    @RequestMapping(value = "/login.do")
-//    public String loginPage() {
-//        return "login";
-//    }
-
-    // 로그인 처리
-//    @RequestMapping(value = "/login", method = RequestMethod.POST)
-//    public String loginUser(@ModelAttribute LoginVO loginVO, Model model) {
-//    	System.out.println("아이디"+loginVO.getId());
-//		System.out.println("비밀번호"+loginVO.getPassword());
-//    	System.out.println("로그인 성공여부"+loginService.loginUser(loginVO));
-//        if (loginService.loginUser(loginVO)) {
-//        	System.out.println("로그인성공");
-//            return "signup";
-//        } else {
-//            model.addAttribute("error", "로그인 정보가 올바르지 않습니다.");
-//            return "login";
-//        }
-//    }
-    
+	@Resource(name = "egovEnvPasswordEncoderService")
+    EgovPasswordEncoder egovPasswordEncoder;
+	
+	@Resource(name = "egovEnvCryptoService")
+    EgovEnvCryptoService cryptoService;
+	
 	/**
 	 * 로그인 화면으로 들어간다
 	 * @param vo - 로그인후 이동할 URL이 담긴 LoginVO
@@ -71,60 +67,84 @@ public class LoginController {
 	 * @exception Exception
 	 */
 	@RequestMapping(value = "/actionLogin.do", method = RequestMethod.POST)
-	public String actionLogin(@ModelAttribute("loginVO") LoginVO loginVO, HttpServletRequest request, Model model) throws Exception {
-		System.out.println("로그인 컨트롤러");
-		System.out.println("vo 아이디"+loginVO.getUserId());
-		
-		// 입력된 비밀번호 암호화
-		String hashedPassword = egovPasswordEncoder.encryptPassword(loginVO.getUserPassword());
-        loginVO.setUserPassword(hashedPassword);
-	    
-		// 1. 일반 로그인 처리
-		LoginVO resultVO = loginService.actionLogin(loginVO);
-		if (resultVO == null) {
-		    System.out.println("resultVO가 null입니다.");
-		    model.addAttribute("message", "로그인에 실패하였습니다.");
-		    return "login";
-		}
-		System.out.println("아이디"+resultVO.getUserId());
-		boolean loginPolicyYn = true;
+	@ResponseBody
+    public Map<String, Object> actionLogin(@RequestBody LoginVO vo, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
 
-		if (resultVO != null && resultVO.getUserId() != null && !resultVO.getUserId().equals("") && loginPolicyYn) {
-			System.out.println("로그인 정보 전송 성공");
-			request.getSession().setAttribute("LoginVO", resultVO);
-			LoginVO sessionUser = (LoginVO) request.getSession().getAttribute("LoginVO");
-			if (sessionUser != null) {
-			    System.out.println("세션에 저장된 사용자 pk: " + sessionUser.getUserPk());
-			} else {
-			    System.out.println("세션에 데이터가 없습니다.");
+        try {
+            LoginVO loginVO = loginService.actionLogin(vo);
+            if(userMapper.countById(vo.getUserId())!= 0) {
+            	boolean isLocked = userMapper.isUserLocked(vo.getUserId()); // user_lock 값 조회
+            	if (isLocked) {
+            		response.put("status", "fail");
+            		response.put("message", "계정이 잠겼습니다. 관리자에게 문의하세요.");
+            		return response;
+            	}
+        	}
+            // 사용자의 현재 잠김 상태 확인
+            
+            if (loginVO != null && EgovStringUtil.isNotEmpty(loginVO.getUserId())) {
+            	// 로그인 성공 시, 잠금 횟수 초기화
+                userMapper.resetLockCount(vo.getUserId());
+            	UserVO loginUser = userMapper.selectUser(loginVO.getUserPk());
+            	loginUser.setUserEmail(cryptoService.decrypt(loginUser.getUserEmail()));
+            	loginUser.setUserPhone(cryptoService.decrypt(loginUser.getUserPhone()));
+            	request.getSession().setAttribute("LoginVO", loginUser);
+//            	LoginVO sessionUser = (LoginVO) request.getSession().getAttribute("LoginVO");
+                response.put("status", "success");
+                response.put("message", "로그인 성공!");
+                response.put("userRole", loginVO.getUserRole());
+            } else if(loginVO == null) {
+            	if(userMapper.countById(vo.getUserId())== 0) {
+            		response.put("status", "fail");
+                    response.put("message", "존재하지 않는 아이디입니다.");
+            	} else {
+            		userMapper.updateLockCount(vo.getUserId());
+            		int lockCount = userMapper.getLockCount(vo.getUserId());
+            		if (lockCount >= 5) {
+                        // 계정 잠금 처리
+                        userMapper.lockUserAccount(vo.getUserId());
+
+                        response.put("status", "fail");
+                        response.put("message", "비밀번호를 5회 틀려 계정이 잠겼습니다. 관리자에게 문의하세요.");
+                    } else {
+                        response.put("status", "fail");
+                        response.put("message", "비밀번호를 틀렸습니다. (" + lockCount + "/5)");
+                    }
+            	}
+            }
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "서버 오류 발생: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+	
+	@RequestMapping(value = "/kakaoLogin.do")
+	public String oauthKakao(
+	        @RequestParam(value = "code",required = false) String code
+	        , HttpSession session, RedirectAttributes rttr, @ModelAttribute("loginVO") LoginVO loginVO, HttpServletRequest request, Model model) throws Exception {
+	    String accessToken = loginService.getAccessToken(code);
+	    UserVO resultVO = loginService.getuserinfo(accessToken, session, rttr);
+	    
+
+	    if (resultVO != null && resultVO.getUserId() != null && !resultVO.getUserId().equals("")) {
+			UserVO loginUser = userMapper.selectUser(resultVO.getUserPk());
+			if(loginUser.getUserEmail()!= null) {
+				loginUser.setUserEmail(cryptoService.decrypt(loginUser.getUserEmail()));
 			}
+			if(loginUser.getUserPhone()!= null) {
+				loginUser.setUserPhone(cryptoService.decrypt(loginUser.getUserPhone()));
+			}
+			request.getSession().setAttribute("LoginVO", resultVO);
 			return "forward:main.do";
 		} else {
 
 			model.addAttribute("message", "로그인에 실패하였습니다.");
 			return "login";
 		}
-
-	}
-
-	/**
-	 * 로그인 후 메인화면으로 들어간다
-	 * @param
-	 * @return 로그인 페이지
-	 * @exception Exception
-	 */
-	@RequestMapping(value = "/uat/uia/actionMain.do")
-	public String actionMain(ModelMap model) throws Exception {
-
-		// 1. 사용자 인증 처리
-//		Boolean isAuthenticated = EgovUserDetailsHelper.isAuthenticated();
-//		if (!isAuthenticated) {
-//			model.addAttribute("message", egovMessageSource.getMessage("fail.common.login"));
-//			return "cmm/uat/uia/EgovLoginUsr";
-//		}
-
-		// 2. 메인 페이지 이동
-		return "forward:egovSampleList";
 	}
 	
 	@RequestMapping(value = "/logout.do")

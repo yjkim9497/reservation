@@ -29,15 +29,12 @@ public class UserServiceImpl implements UserService {
     	if (userVO.getUserRegDate() == null) {
             userVO.setUserRegDate(LocalDateTime.now());
         }
-    	
-    	System.out.println("회원가입 서비스 단"+userVO.getUserRole());
-
         userMapper.insertUser(userVO);
     }
 
     @Override
-    public UserVO getUser(String id) {
-        return userMapper.selectUser(id);
+    public UserVO getUser(Long userPk) {
+        return userMapper.selectUser(userPk);
     }
     
     @Override
@@ -47,8 +44,18 @@ public class UserServiceImpl implements UserService {
         // 이메일과 연락처 복호화 처리
         return users.stream()
             .map(user -> {
-                user.setUserEmail(cryptoService.decrypt(user.getUserEmail()));
-                user.setUserPhone(formatPhone(cryptoService.decrypt(user.getUserPhone())));
+            	// 이메일이 존재하는 경우만 복호화
+                if (user.getUserEmail() != null && !user.getUserEmail().isEmpty()) {
+                    user.setUserEmail(cryptoService.decrypt(user.getUserEmail()));
+                }
+
+                // 연락처가 존재하는 경우만 복호화 및 포맷팅
+                if (user.getUserPhone() != null && !user.getUserPhone().isEmpty()) {
+                    String decryptedPhone = cryptoService.decrypt(user.getUserPhone());
+                    user.setUserPhone(formatPhone(decryptedPhone));
+                }
+//                user.setUserEmail(cryptoService.decrypt(user.getUserEmail()));
+//                user.setUserPhone(formatPhone(cryptoService.decrypt(user.getUserPhone())));
                 user.setRegDateFormatted(formatRegDate(user.getUserRegDate()));
                 return user;
             })
@@ -73,8 +80,8 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public void deleteUser(String id) {
-        userMapper.deleteUser(id);
+    public void deleteUser(Long userPk) {
+        userMapper.deleteUser(userPk);
     }
 
     @Override

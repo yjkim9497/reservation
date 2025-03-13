@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.mapper.HolidayMapper">
+
+    <!-- BoardVO와 매칭되는 resultMap 정의 -->
+    <resultMap id="HolidayResultMap" type="egovframework.vo.HolidayVO">
+        <result property="holidayPk" column="holiday_pk"/>
+        <result property="holidayStart" column="holiday_start"/>
+        <result property="holidayEnd" column="holiday_end"/>
+    </resultMap>
+
+    <insert id="insertHoliday" parameterType="egovframework.vo.HolidayVO">
+        INSERT INTO holiday (holiday_start, holiday_end)
+        VALUES (#{holidayStart}, #{holidayEnd})
+    </insert>
+
+    <delete id="deleteHoliday" parameterType="egovframework.vo.HolidayVO">
+        DELETE FROM holiday WHERE holiday_pk = #{holidayPk}
+    </delete>
+    
+    <select id="getAllHolidays" resultMap="HolidayResultMap">
+        SELECT holiday_pk, holiday_start, holiday_end FROM holiday
+    </select>
+    
+    <select id="checkHolidayDouble" parameterType="java.util.Map" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM holiday
+	    WHERE 
+	        DATE(#{holidayStart}) BETWEEN DATE(holiday_start) AND DATE(holiday_end)
+	        OR DATE(#{holidayEnd}) BETWEEN DATE(holiday_start) AND DATE(holiday_end)
+	        OR DATE(holiday_end) BETWEEN DATE(#{holidayStart}) AND DATE(#{holidayEnd})
+	        OR DATE(holiday_end) BETWEEN DATE(#{holidayStart}) AND DATE(#{holidayEnd})
+	</select>
+
+	<select id="checkSeminarOverlap" parameterType="java.util.Map" resultType="int">
+	    SELECT COUNT(*) 
+	    FROM holiday
+	    WHERE 
+	        DATE(#{seminarStart}) BETWEEN DATE(holiday_start) AND DATE(holiday_end)
+	        OR DATE(#{seminarEnd}) BETWEEN DATE(holiday_start) AND DATE(holiday_end)
+	        OR DATE(holiday_end) BETWEEN DATE(#{seminarStart}) AND DATE(#{seminarEnd})
+	        OR DATE(holiday_end) BETWEEN DATE(#{seminarStart}) AND DATE(#{seminarEnd})
+	</select>
+</mapper>

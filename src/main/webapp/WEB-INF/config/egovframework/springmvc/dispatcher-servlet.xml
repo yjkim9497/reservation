@@ -69,7 +69,7 @@
         </property>
     </bean>
 	<!-- /For Pagination Tag -->
-
+<!-- 	<mvc:resources mapping="/images/**" location="/images/" /> -->
     <mvc:view-controller path="/cmmn/validator.do" view-name="cmmn/validator"/>
     <mvc:view-controller path="/login.do" view-name="login"/>
 </beans>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.mapper.CommentMapper">
+
+    <!-- BoardVO와 매칭되는 resultMap 정의 -->
+    <resultMap id="commentResultMap" type="egovframework.vo.CommentVO">
+        <result property="commentPk" column="comment_pk"/>
+        <result property="commentDescription" column="comment_description"/>
+        <result property="commentPassword" column="comment_password"/>
+        <result property="commentRegDate" column="comment_reg_date"/>
+        <result property="boardPk" column="board_pk"/>
+        <result property="userPk" column="user_pk"/>
+    </resultMap>
+
+    <insert id="insertComment" parameterType="egovframework.vo.CommentVO">
+        INSERT INTO comment (comment_description, comment_password, comment_reg_date, user_pk, board_pk)
+        VALUES (#{commentDescription}, #{commentPassword}, NOW(), #{userPk}, #{boardPk})
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="updateComment" parameterType="egovframework.vo.CommentVO">
+        UPDATE comment
+        SET comment_description = #{commentDescription}
+        WHERE comment_pk = #{commentPk}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="deleteComment" parameterType="long">
+        DELETE FROM comment WHERE comment_pk = #{commentPk}
+    </delete>
+
+    <!-- 특정 게시글의 댓글 목록 조회 -->
+    <select id="selectCommentsByBoardPk" parameterType="long" resultMap="commentResultMap">
+        SELECT * FROM comment WHERE board_pk = #{boardPk} ORDER BY comment_reg_date DESC
+    </select>
+    
+    <!-- 특정 게시글의 댓글 개수 조회 -->
+	<select id="countCommentsByBoardPk" parameterType="long" resultType="int">
+	    SELECT COUNT(*) FROM comment WHERE board_pk = #{boardPk}
+	</select>
+
+</mapper>

@@ -2,6 +2,7 @@ package egovframework.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.egovframe.rte.psl.dataaccess.mapper.Mapper;
 
 import egovframework.vo.BoardVO;
@@ -39,7 +40,7 @@ public interface BoardMapper {
 	 * @return 조회한 글
 	 * @exception Exception
 	 */
-	BoardVO selectBoard(BoardVO vo) throws Exception;
+	BoardVO selectBoard(@Param("boardPk") Long boardPk) throws Exception;
 
 	/**
 	 * 글 목록을 조회한다.

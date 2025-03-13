@@ -3,16 +3,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<c:set var="currentPage" value="board" />
 <%@ include file="navbar.jsp" %>
 <!DOCTYPE html>
 <html>
+<link href="../../resouces/font/pretendard.css">
 <head>
     <meta charset="UTF-8">
     <title>게시글 등록</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'pretendard';
             margin: 20px;
         }
         form {
@@ -40,60 +41,105 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   	<script type="text/javaScript">
-	        
-	    /* 글 등록 화면 function */
-	    function addBoard() {
-	    	var formData = {
-	    	boardTitle: $("#boardTitle").val(),
-	    	boardDescription: $("#boardDescription").val()
-	    	};
-	    	
-	    	$.ajax({
-	    	    url: "<c:url value='/addBoard.do'/>",
-	    	    type: "POST",
-	    	    contentType: "application/json", // ✅ JSON 형식 명시
-	    	    dataType: "json", // ✅ JSON 응답을 받을 것이라고 명시
-	    	    data: JSON.stringify({
-	    	        boardTitle: $("#boardTitle").val(),
-	    	        boardDescription: $("#boardDescription").val()
-	    	    }),
-	    	    success: function(response) {
-	    	        console.log(response); // ✅ JSON 형태로 로그 확인
-	    	        if (response.success) {
-	    	            alert("게시글이 등록되었습니다.");
-	    	            window.location.href = "/test1/boardList.do";
-	    	        } else {
-	    	            alert("게시글 등록에 실패했습니다. 다시 시도해주세요.");
-	    	        }
-	    	    },
-	    	    error: function(xhr, status, error) {
-	    	        console.error("오류 발생:", error);
-	    	        alert("서버 오류로 인해 게시글 등록에 실패했습니다.");
-	    	    }
-	    	});
 
-	    }
-	
-	</script>
+    <script type="text/javascript">
+        function addBoard() {
+        	console.log('세미나 번호 : '+$("#seminarPk").val());
+        	var formData = new FormData();
+            formData.append("boardTitle", $("#boardTitle").val());
+            formData.append("boardDescription", $("#boardDescription").val());
+            formData.append("boardPassword", $("#boardPassword").val());
+            var seminarPk = $("#seminarPk").val();
+            if (seminarPk) {
+                formData.append("seminarPk", seminarPk);
+            }
+            var fileInput = $("#file")[0].files;
+            if (fileInput.length > 0) {
+                formData.append("file", fileInput[0]); // 파일이 있을 때만 추가
+            }
+            
+            /* formData.append("file", $("#file")[0].files[0]); // 파일 추가 */
+            
+            console.log('formData board : ', formData.get("boardTitle"));
+            console.log('formData des : ', formData.get("boardDescription"));
+            console.log('formData pass : ', formData.get("boardPassword"));
+            console.log('formData file : ', formData.get("file"));
+            console.log('formData seminarPk : ', formData.get("seminarPk"));
+            $.ajax({
+                url: "<c:url value='/addBoard.do'/>",
+                type: "POST",
+                data: formData, 
+                processData: false,  
+                contentType: false,  
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        alert("게시글이 등록되었습니다.");
+                        window.location.href = "/test1/boardList.do";
+                    } else {
+                        alert("게시글 등록에 실패했습니다. 다시 시도해주세요.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                	console.log(formData)
+                    console.error("오류 발생:", error);
+                    alert("서버 오류로 인해 게시글 등록에 실패했습니다.");
+                }
+            });
+
+            return false; // 폼 기본 제출 방지
+        }
+        
+        $("#boardForm").on("submit", function(event) {
+            event.preventDefault();
+            addBoard();
+        });
+
+    </script>
+
 </head>
 <body>
+<div class="container mt-4">
+        <!-- Title Section -->
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+		  <ol class="breadcrumb">
+		    <li class="breadcrumb-item"><a href="/test1">홈</a></li>
+		    <li class="breadcrumb-item"><a href="/test1/boardList.do">질문게시판</a></li>
+		    <li class="breadcrumb-item active" aria-current="page">게시글 등록</li>
+		  </ol>
+		</nav>
+    	<h2 class="mb-4">질문게시판</h2>
 
-<h2>게시글 등록</h2>
-
-<form:form modelAttribute="boardVO" id="boardForm" name="boardForm">
+<form id="boardForm" enctype="multipart/form-data" onsubmit="return addBoard();">
     <label for="boardTitle">제목</label>
-    <form:input path="boardTitle" id="boardTitle" required="required"/>
+    <input type="text" name="boardTitle" id="boardTitle" required/>
+   	
+   	<!-- <label for="seminarPk">세미나</label> -->
+	<div class="form-group mt-2 mb-2">
+	    <select class="form-select" name="seminarPk" id="seminarPk">
+	        <option value="">세미나를 선택하세요</option>
+	        <c:forEach var="seminar" items="${seminars}">
+	            <option value="${seminar.seminarPk}">${seminar.seminarName}</option>
+	        </c:forEach>
+	    </select>
+	</div>
+
 
     <label for="boardDescription">내용</label>
-    <form:textarea path="boardDescription" id="boardDescription" rows="5" required="required"/>
+    <textarea name="boardDescription" id="boardDescription" rows="5" required></textarea>
+
+    <label for="file">파일</label>
+    <input type="file" name="file" id="file"/>
+
+    <label for="boardPassword">비밀번호</label>
+    <input type="password" name="boardPassword" id="boardPassword" required/>
 
     <!-- 사용자 ID는 로그인된 유저 정보를 가져와 자동으로 설정 -->
-    <form:hidden path="userPk" value="${sessionScope.loginUser.userPk}" />
+    <input type="hidden" name="userPk" value="${sessionScope.loginUser.userPk}" />
 
-    <button type="button" onclick="addBoard()">등록</button>
-</form:form>
-
+    <button type="submit">등록</button>
+</form>
+</div>
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>

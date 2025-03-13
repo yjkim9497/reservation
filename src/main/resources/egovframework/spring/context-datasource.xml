@@ -20,11 +20,11 @@
     <alias name="dataSource-${Globals.DbType}" alias="egov.dataSource" />
     
     <!-- maria -->
-	<!-- <bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-	    <property name="driverClassName" value="${Globals.DriverClassName}"/>
-	    <property name="url" value="${Globals.Url}" />
-	    <property name="username" value="${Globals.UserName}"/>
-	    <property name="password" value="${Globals.Password}"/>
+<!-- 	<bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+	    <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+	    <property name="url" value="jdbc:mariadb://192.168.80.128:3306/test1" />
+	    <property name="username" value="root"/>
+	    <property name="password" value="rladuswl54"/>
 	</bean> -->
 	
 	<bean id="dataSource-maria" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">

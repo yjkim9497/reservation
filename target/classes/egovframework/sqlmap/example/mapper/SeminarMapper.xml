@@ -4,23 +4,75 @@
 
 	<resultMap id="SeminarResultMap" type="egovframework.vo.SeminarVO">
 		<result column="seminar_pk" property="seminarPk"/>
-		<result column="seminar_date" property="seminarDate"/>
-		<result column="seminar_time_slot" property="seminarTimeSlot"/>
+		<result column="seminar_name" property="seminarName"/>
+		<result column="seminar_start" property="seminarStart"/>
+		<result column="seminar_end" property="seminarEnd"/>
 		<result column="seminar_capacity" property="seminarCapacity"/>
+		<result column="seminar_url" property="seminarUrl"/>
+		<result column="seminar_file_name" property="seminarFileName"/>
+		<result column="seminar_file_path" property="seminarFilePath"/>
+		<result column="seminar_place" property="seminarPlace"/>
+		<result column="seminar_status" property="seminarStatus"/>
 		<result column="seminar_current_people" property="seminarCurrentPeople"/>
 	</resultMap>
 	
 	<insert id="insertSeminar" parameterType="egovframework.vo.SeminarVO">
-        INSERT INTO SEMINAR (SEMINAR_DATE, SEMINAR_NAME, SEMINAR_TIME_SLOT, SEMINAR_CAPACITY)
-        VALUES (#{seminarDate}, #{seminarName}, #{seminarTimeSlot}, #{seminarCapacity})
+        INSERT INTO seminar (seminar_name, seminar_start, seminar_end, seminar_capacity, seminar_file_name, seminar_file_path, seminar_place, seminar_url)
+        VALUES (#{seminarName}, #{seminarStart}, #{seminarEnd}, #{seminarCapacity}, #{seminarFileName}, #{seminarFilePath}, #{seminarPlace}, #{seminarUrl})
     </insert>
+    
+    <select id="selectAllSeminars" resultMap="SeminarResultMap">
+    	SELECT *
+    	FROM seminar
+    	ORDER BY seminar_pk DESC
+    </select>
+    
+    <select id="selectSeminarDate" resultType="java.util.HashMap">
+    	SELECT seminar_start, seminar_end
+    	FROM seminar
+    </select>
+    
+    <select id="checkHolidayOverlap" parameterType="java.util.Map" resultType="int">
+	    SELECT COUNT(*) 
+		FROM seminar
+		WHERE 
+		    (DATE(#{holidayStart}) BETWEEN DATE(seminar_start) AND DATE(seminar_end))
+        OR (DATE(#{holidayEnd}) BETWEEN DATE(seminar_start) AND DATE(seminar_end))
+        OR (DATE(seminar_start) BETWEEN DATE(#{holidayStart}) AND DATE(#{holidayEnd}))
+        OR (DATE(seminar_end) BETWEEN DATE(#{holidayStart}) AND DATE(#{holidayEnd}))
+	</select>
+    
+    <select id="selectLatestSeminars" resultMap="SeminarResultMap">
+	    SELECT *
+	    FROM seminar
+	    ORDER BY seminar_start
+	    LIMIT 3
+	</select>
+    
+    <!-- <select id="selectAllSeminars" resultType="egovframework.vo.SeminarVO">
+        SELECT 
+            seminar_pk AS seminarPk,
+            seminar_date AS seminarDate,
+            seminar_name AS seminarName,
+            seminar_time_slot AS seminarTimeSlot,
+            seminar_capacity AS seminarCapacity,
+            seminar_status AS seminarStatus,
+            seminar_current_people AS seminarCurrentPeople
+        FROM seminar
+    </select> -->
 	
 	<!-- 세미나 날짜로 세미나 조회하는 쿼리 -->
-    <select id="findByDate" parameterType="java.time.LocalDate" resultMap="SeminarResultMap">
+	<select id="findByDate" parameterType="java.time.LocalDate" resultMap="SeminarResultMap">
+	    SELECT *
+	    FROM seminar
+	    WHERE #{seminarDate} BETWEEN seminar_start AND seminar_end
+	</select>
+	
+    <!-- <select id="findByDate" parameterType="java.time.LocalDate" resultMap="SeminarResultMap">
         SELECT *
         FROM seminar
         WHERE seminar_date = #{seminarDate}
-    </select>
+    </select> -->
     
     <select id="findByPk" parameterType="long" resultMap="SeminarResultMap">
     	SELECT *
@@ -41,5 +93,21 @@
         SET seminar_current_people = #{seminarCurrentPeople}
         WHERE seminar_pk = #{seminarPk}
     </update>
+    
+    <update id="updateSeminarStatus" parameterType="long">
+    	UPDATE seminar
+    	SET seminar_status = 'FULL'
+    	WHERE seminar_pk = #{seminarPk}
+    </update>
+    
+    <update id="updateSeminarCompleted" parameterType="long">
+    	UPDATE seminar
+    	SET seminar_status = 'COMPLETED'
+    	WHERE seminar_pk = #{seminarPk}
+    </update>
+    
+    <delete id="deleteSeminar" parameterType="long">
+    	DELETE FROM seminar WHERE seminar_pk = #{seminarPk}
+    </delete>
     
 </mapper>

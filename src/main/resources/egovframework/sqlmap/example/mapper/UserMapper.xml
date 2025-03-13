@@ -30,6 +30,15 @@
         INSERT INTO user (user_id, user_password, user_role, user_name, user_email, user_phone, user_birth, user_reg_date, user_lock, user_lock_count)
         VALUES (#{userId}, #{userPassword}, #{userRole}, #{userName}, #{userEmail}, #{userPhone}, #{userBirth}, NOW(), false, 0)
     </insert>
+    
+    <select id="findkakao" resultMap="user" parameterType="HashMap">
+        select * from user where user_id = #{userId}
+    </select>
+
+    <insert id="kakaoinsert">
+    insert into user (user_id, user_name, user_reg_date, user_lock, user_lock_count)
+    values (#{userId}, #{userName}, NOW(), false, 0)
+    </insert>
 
     <!-- 로그인 -->
     <select id="actionLogin" resultMap="login">
@@ -39,10 +48,10 @@
     </select>
 
     <!-- 회원 정보 조회 -->
-    <select id="selectUser" parameterType="string" resultMap="user">
+    <select id="selectUser" parameterType="long" resultMap="user">
         SELECT user_pk, user_id, user_password, user_role, user_name, user_email, user_phone, user_birth, user_reg_date, user_lock, user_lock_count
         FROM user 
-        WHERE user_id = #{userId}
+        WHERE user_pk = #{userPk}
     </select>
 
     <!-- 전체 회원 조회 -->
@@ -52,39 +61,60 @@
     </select>
 
     <!-- 사용자 삭제 -->
-    <delete id="deleteUser" parameterType="string">
-        DELETE FROM user WHERE user_id = #{userId}
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM user WHERE user_pk = #{userPk}
     </delete>
 
     <!-- 사용자 정보 수정 -->
     <update id="updateUser" parameterType="egovframework.vo.UserVO">
         UPDATE user
         SET user_password = #{userPassword},
-            user_role = #{userRole, jdbcType=VARCHAR},
             user_name = #{userName},
             user_email = #{userEmail},
             user_phone = #{userPhone},
             user_birth = #{userBirth}
-        WHERE user_id = #{userId}
+        WHERE user_pk = #{userPk}
     </update>
 
     <!-- 아이디 중복 확인 -->
     <select id="countById" resultType="int">
         SELECT COUNT(*) FROM user WHERE user_id = #{userId}
     </select>
-
-    <!-- 사용자 계정 잠금 상태 업데이트 -->
-    <update id="updateUserLock" parameterType="map">
-        UPDATE user
-        SET user_lock = #{userLock}, user_lock_count = #{userLockCount}
+    
+    <update id="updateLockCount" parameterType="string">
+    	UPDATE user
+        SET user_lock_count = user_lock_count + 1
         WHERE user_id = #{userId}
     </update>
-
-    <!-- 사용자 계정 잠금 해제 (초기화) -->
-    <update id="resetUserLock" parameterType="string">
-        UPDATE user
-        SET user_lock = false, user_lock_count = 0
-        WHERE user_id = #{userId}
-    </update>
+    
+    <!-- 현재 lock_count 조회 -->
+	<select id="getLockCount" parameterType="string" resultType="int">
+	    SELECT user_lock_count FROM user WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 계정 잠금 처리 -->
+	<update id="lockUserAccount" parameterType="string">
+	    UPDATE user
+	    SET user_lock = true
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<!-- 계정이 잠겨 있는지 확인 -->
+	<select id="isUserLocked" parameterType="string" resultType="boolean">
+	    SELECT user_lock FROM user WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 로그인 성공 시 lock_count 초기화 -->
+	<update id="resetLockCount" parameterType="string">
+	    UPDATE user
+	    SET user_lock_count = 0
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<update id="unlockUserAccount" parameterType="long">
+	    UPDATE user
+	    SET user_lock = false, user_lock_count = 0
+	    WHERE user_Pk = #{userPk}
+	</update>
 
 </mapper>

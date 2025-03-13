@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://maven.egovframe.go.kr/schema/egov-crypto http://maven.egovframe.go.kr/schema/egov-crypto/egov-crypto-3.10.0.xsd">
 		
-<!-- 		<bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+ 		<!-- <bean name="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 			<property name="useCodeAsDefaultMessage">
 				<value>true</value>
 			</property>

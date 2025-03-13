@@ -7,16 +7,20 @@
         <result property="boardPk" column="board_pk"/>
         <result property="boardTitle" column="board_title"/>
         <result property="boardDescription" column="board_description"/>
+        <result property="boardFileName" column="board_file_name"/>
+        <result property="boardFilePath" column="board_file_path"/>
+        <result property="boardPassword" column="board_password"/>
         <result property="boardRegDate" column="board_reg_date"/>
         <result property="userPk" column="user_pk"/>
+        <result property="seminarPk" column="seminar_pk"/>
     </resultMap>
 
     <!-- 게시글 등록 -->
     <insert id="insertBoard" parameterType="egovframework.vo.BoardVO">
         INSERT INTO board 
-            (board_title, board_description, board_reg_date, user_pk)
+            (board_title, board_description, board_password, board_file_name, board_file_path, board_reg_date, user_pk, seminar_pk)
         VALUES 
-            (#{boardTitle}, #{boardDescription}, NOW(), #{userPk})
+            (#{boardTitle}, #{boardDescription}, #{boardPassword} , #{boardFileName}, #{boardFilePath}, NOW(), #{userPk}, #{seminarPk})
     </insert>
 
     <!-- 게시글 수정 -->
@@ -24,7 +28,11 @@
         UPDATE board
         SET board_title = #{boardTitle},
             board_description = #{boardDescription},
-            user_pk = #{userPk}
+            board_password = #{boardPassword},
+            board_file_name = #{boardFileName},
+            board_file_path = #{boardFilePath},
+            user_pk = #{userPk},
+            seminar_pk = #{seminarPk}
         WHERE board_pk = #{boardPk}
     </update>
 
@@ -35,7 +43,7 @@
 
     <!-- 특정 게시글 조회 -->
     <select id="selectBoard" parameterType="long" resultMap="boardResultMap">
-        SELECT board_pk, board_title, board_description, board_reg_date, user_pk
+        SELECT board_pk, board_title, board_description, board_password, board_file_name, board_file_path, board_reg_date, user_pk, seminar_pk
         FROM board
         WHERE board_pk = #{boardPk}
     </select>
@@ -48,9 +56,13 @@
 	        b.board_description, 
 	        b.board_reg_date, 
 	        b.user_pk,
-	        u.user_name  <!-- 🔹 user_name 추가 -->
+	        COALESCE(u.user_name, '비회원') AS user_name,  <!-- user_name이 null이면 '정보 없음'으로 처리 -->
+	        COALESCE(s.seminar_name, '기타') AS seminar_name,  <!-- user_name이 null이면 '정보 없음'으로 처리 -->
+	    	COALESCE(COUNT(c.comment_pk), 0) AS comment_count
 	    FROM board b
-	    INNER JOIN user u ON b.user_pk = u.user_pk  <!-- 🔹 user 테이블과 조인 -->
+	    LEFT JOIN user u ON b.user_pk = u.user_pk  <!-- LEFT JOIN을 사용하여 일치하는 값이 없을 경우에도 결과를 반환 -->
+	    LEFT JOIN seminar s ON b.seminar_pk = s.seminar_pk  <!-- LEFT JOIN을 사용하여 일치하는 값이 없을 경우에도 결과를 반환 -->
+	    LEFT JOIN comment c ON b.board_pk = c.board_pk
 	    WHERE 1=1
 	    <if test="searchKeyword != null and searchKeyword != ''">
 	        <choose>
@@ -62,9 +74,11 @@
 	            </when>
 	        </choose>
 	    </if>
+	    GROUP BY b.board_pk, u.user_name, s.seminar_name
 	    ORDER BY b.board_pk DESC
 	    LIMIT #{recordCountPerPage} OFFSET #{firstIndex}
 	</select>
+
 
 
     <!-- 게시글 총 개수 조회 -->

@@ -19,6 +19,8 @@ public class ReserveVO {
     private Timestamp reservationTime; // 예약 신청 시간
     private Long userPk;              // 유저 ID
     private Long seminarPk;           // 세미나 ID
+    private String seminarName;
+    private String userName;
 	public Long getReservationPk() {
 		return reservationPk;
 	}
@@ -84,6 +86,18 @@ public class ReserveVO {
 	}
 	public void setSeminarPk(Long seminarPk) {
 		this.seminarPk = seminarPk;
+	}
+	public String getSeminarName() {
+		return seminarName;
+	}
+	public void setSeminarName(String seminarName) {
+		this.seminarName = seminarName;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	
     

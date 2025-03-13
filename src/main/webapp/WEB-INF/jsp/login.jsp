@@ -14,7 +14,7 @@
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: pretendard;
     background-color: #f4f4f4;
     display: flex;
     justify-content: center;
@@ -70,78 +70,69 @@ body {
     background-color: #007bff;
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+    margin-top: 5px;
 }
 
 .login-container button:hover {
     background-color: #0056b3;
 }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
-    function actionLogin() {
+	/*  $(document).ready(function () {
+	    var message = `${'${message}'}`;
+	    if (message.trim() !== "") {
+	        alert(message);
+	        return false;
+	    }
+	}); */ 
+	
+	async function actionLogin() {
+	    const userId = document.getElementById("userId").value;
+	    const userPassword = document.getElementById("userPassword").value;
 
-        if (document.loginForm.userId.value == "") {
-            alert("아이디를 입력하세요");
-            return false;
-        } else if (document.loginForm.userPassword.value == "") {
-            alert("비밀번호를 입력하세요");
-            return false;
-        } else {
-            document.loginForm.action = "<c:url value='actionLogin.do'/>";
-            document.loginForm.submit();
-        }
-    }
-    <!--
+	    if (userId.trim() === "") {
+	        alert("아이디를 입력하세요");
+	        return;
+	    }
+	    if (userPassword.trim() === "") {
+	        alert("비밀번호를 입력하세요");
+	        return;
+	    }
 
-    function setCookie(name, value, expires) {
-        document.cookie = name + "=" + escape(value) + "; path=/; expires="
-                + expires.toGMTString();
-    }
+	    const loginData = { userId, userPassword };
 
-    function getCookie(Name) {
-        var search = Name + "="
-        if (document.cookie.length > 0) { // 쿠키가 설정되어 있다면
-            offset = document.cookie.indexOf(search)
-            if (offset != -1) { // 쿠키가 존재하면
-                offset += search.length
-                // set index of beginning of value
-                end = document.cookie.indexOf(";", offset)
-                // 쿠키 값의 마지막 위치 인덱스 번호 설정
-                if (end == -1)
-                    end = document.cookie.length
-                return unescape(document.cookie.substring(offset, end))
-            }
-        }
-        return "";
-    }
+	    try {
+	        const response = await fetch("/test1/actionLogin.do", {
+	            method: "POST",
+	            headers: {
+	                "Content-Type": "application/json"
+	            },
+	            body: JSON.stringify(loginData)
+	        });
 
-    function saveid(form) {
-        var expdate = new Date();
-        // 기본적으로 30일동안 기억하게 함. 일수를 조절하려면 * 30에서 숫자를 조절하면 됨
-        if (form.checkId.checked)
-            expdate.setTime(expdate.getTime() + 1000 * 3600 * 24 * 30); // 30일
-        else
-            expdate.setTime(expdate.getTime() - 1); // 쿠키 삭제조건
-        setCookie("saveid", form.id.value, expdate);
-    }
+	        const result = await response.json();
 
-    function getid(form) {
-        form.checkId.checked = ((form.id.value = getCookie("saveid")) != "");
-    }
+	        if (result.status === "success") {
+	            alert(result.message);
+	            window.location.href = "/test1/main.do"; 
+	        } else {
+	            alert(result.message); // 로그인 실패 메시지 출력
+	        }
+	    } catch (error) {
+	        alert("서버 오류 발생: " + error.message);
+	    }
+	}
 
-    function fnInit() {
-        var message = document.loginForm.message.value;
-        if (message != "") {
-            alert(message);
-        }
-        getid(document.loginForm);
-    }
-    //-->
+    function kakaoLogin() {
+    	location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=86deb5ba96687995c0fd88d76e9f9008&redirect_uri=http://localhost:8081/test1/kakaoLogin.do&response_type=code';
+    	}
 </script>
 </head>
-<body onload="initialize()">
+<body>
     <noscript>자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다.</noscript>
     <!-- 전체 레이어 시작 -->
 
@@ -163,9 +154,22 @@ body {
                             저장</label>
                     </div>
 
-                    <button type="button" onclick="actionLogin()">로그인</button>
-                    <!-- <div style="text-align: center; margin: 10px 0;">--- 또는 ---</div> -->
-                    <button style="text-align: center; margin: 20px 0;" type="button" onclick="window.location.href='/test1/signup.do'">회원가입</button>
+                    <div style="text-align: center;">
+					    <button type="button" onclick="actionLogin()" 
+					        style="display: block; background-color: black; width: 100%; margin-bottom: 10px;">
+					        로그인
+					    </button>
+					    
+					    <button type="button" onclick="kakaoLogin()" 
+					        style="display: block; background-color: #FEE500; width: 100%;">
+					        카카오로 로그인
+					    </button>
+					</div>
+					
+					<a href="/test1/signup.do" 
+					   style="display: block; text-align: right;  font-size: 12px; color: black; text-decoration: none; margin-top: 10px;">
+					    회원가입
+					</a>
 
                     <input type="hidden" name="message" value="${message}" />
                     <input type="hidden" name="userSe" value="USR" />

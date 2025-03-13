@@ -10,13 +10,16 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/test1/">홈</a>
+                    <a class="nav-link ${currentPage eq 'home' ? 'active' : ''}" href="/test1/">홈</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/test1/reservation.do">예약하기</a>
+                    <a class="nav-link ${currentPage eq 'seminar' ? 'active' : ''}" href="/test1/seminar/list.do">세미나</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/test1/boardList.do">질문게시판</a>
+                    <a class="nav-link ${currentPage eq 'reservation' ? 'active' : ''}" href="/test1/reservation.do">예약하기</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ${currentPage eq 'board' ? 'active' : ''}" href="/test1/boardList.do">질문게시판</a>
                 </li>
             </ul>
             <c:if test="${sessionScope.LoginVO == null}">
@@ -30,12 +33,14 @@
                 <ul class="navbar-nav">
 	                <c:if test="${sessionScope.LoginVO.userRole eq 'ADMIN'}">
 	                	<li class="nav-item">
-	                        <a class="nav-link" href="/test1/admin.do">관리자페이지</a>
+	                        <a class="nav-link ${currentPage eq 'admin' ? 'active' : ''}" href="/test1/admin.do">관리자페이지</a>
 	                    </li>
 	                </c:if>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/test1/mypage.do">마이페이지</a>
-                    </li>
+	                <c:if test="${sessionScope.LoginVO.userRole eq 'GENERAL'}">
+	                	<li class="nav-item">
+                        <a class="nav-link ${currentPage eq 'mypage' ? 'active' : ''}" href="/test1/mypage.do">마이페이지</a>
+	                    </li>
+	                </c:if>
                     <li class="nav-item">
                         <a class="nav-link" href="/test1/logout.do">로그아웃</a>
                     </li>

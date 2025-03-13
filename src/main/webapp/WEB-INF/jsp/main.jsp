@@ -3,6 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="ui" uri="http://egovframework.gov/ctl/ui"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<c:set var="currentPage" value="home" />
 <%@ include file="navbar.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -12,84 +13,158 @@
     <title>세미나 예약 메인 | <spring:message code="title.sample" /></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../resouces/font/pretendard.css">
     <style>
+        * {
+            font-family: 'pretendard';
+        }
+
         body {
             background-color: #f8f9fa;
+            font-family: 'pretendard';
         }
-        .carousel-item img {
-            max-height: 500px;
-            object-fit: cover;
+
+        /* 캐러셀 여백 동일하게 맞추기 */
+        .carousel-container, .seminar-list-container {
+            padding-left: 15px;
+            padding-right: 15px;
         }
-        .card {
-            transition: transform 0.3s;
+
+        /* 세미나 목록을 수평으로 가로로 스크롤할 수 있도록 설정 */
+        .seminar-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            scroll-behavior: smooth; /* 스크롤 애니메이션을 부드럽게 만듬 */
         }
-        .card:hover {
-            transform: scale(1.05);
+
+        .seminar-list .card {
+            min-width: 250px; /* 카드 최소 너비 */
+            flex-shrink: 0;
         }
+
+        /* 세미나 목록이 너무 길어지면 스크롤바가 보이도록 */
+        .seminar-list::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .seminar-list::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        /* 세미나 목록을 감싸는 컨테이너 */
+        .seminar-list-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* 세미나 목록 내 버튼 위치 */
+        .scroll-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            padding: 10px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .scroll-button-left {
+            left: 0;
+        }
+
+        .scroll-button-right {
+            right: 0;
+        }
+        
+        a {
+		    text-decoration: none !important;
+		}
+        
     </style>
 </head>
 <body>
 
 <%@ include file="navbar.jsp" %>
 
-<div class="container mt-4">
-    <!-- 🚀 캐러셀 (세미나 슬라이드) -->
-    <div id="seminarCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#seminarCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#seminarCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#seminarCarousel" data-bs-slide-to="2"></button>
+<div class="container">
+    <!-- 캐러셀 영역 -->
+    <div class="carousel-container">
+		    <h3 class="text-center" style="margin-top: -30px">🔥 마감 임박 세미나</h3>
+        <div id="seminarCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-indicators">
+                <c:forEach var="seminar" items="${seminars}" varStatus="status">
+                    <button type="button" data-bs-target="#seminarCarousel" data-bs-slide-to="${status.index}" 
+                        class="${status.index == 0 ? 'active' : ''}"></button>
+                </c:forEach>
+            </div>
+            <div class="carousel-inner">
+                <c:forEach var="seminar" items="${seminars}" varStatus="status">
+                    <div class="carousel-item text-center ${status.index == 0 ? 'active' : ''}">
+	                    <a href="/test1/seminar/detail.do?seminarPk=${seminar.seminarPk}">
+	                        <img src="${seminar.seminarFilePath}" alt="세미나 이미지" width="960" height="540">
+	                    </a>
+                    </div>
+                </c:forEach>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#seminarCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#seminarCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
         </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://cdn.goodkyung.com/news/photo/202210/189479_151296_2725.jpg" class="d-block w-100" alt="세미나 이미지 1">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>최신 IT 세미나</h5>
-                    <p>최고의 IT 전문가들과 함께하는 시간</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://i.ytimg.com/vi/ng08_uiVzx8/sddefault.jpg?v=6204df78" class="d-block w-100" alt="세미나 이미지 2">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>비즈니스 전략 세미나</h5>
-                    <p>최고의 비즈니스 인사이트를 경험하세요</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://www.kgnews.co.kr/data/photos/20211249/art_16392859725788_733e2c.jpg" class="d-block w-100" alt="세미나 이미지 3">
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>AI & 데이터 분석</h5>
-                    <p>최신 AI 기술 트렌드를 알아보세요</p>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#seminarCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#seminarCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
     </div>
 
-    <!-- 🎯 인기 세미나 목록 -->
-    <h2 class="text-center mt-5">🔥 인기 세미나</h2>
-    <div class="row mt-4">
-        <c:forEach var="seminar" items="${popularSeminars}">
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="https://source.unsplash.com/400x250/?lecture" class="card-img-top" alt="세미나 이미지">
-                    <div class="card-body">
-                        <h5 class="card-title">${seminar.title}</h5>
-                        <p class="card-text">${seminar.description}</p>
-                        <a href="reservation/${seminar.id}" class="btn btn-primary">예약하기</a>
+    <!-- 세미나 목록 -->
+    <h2 class="mt-5">세미나 목록</h2>
+    <div class="seminar-list-wrapper">
+        <div class="seminar-list-container">
+            <div class="seminar-list">
+                <c:forEach var="seminar" items="${seminarList}">
+                    <div class="col-md-3 mb-4"> <!-- 기존의 col-md-4에서 col-md-3로 변경하여 가로 길이를 줄임 -->
+                        <a href="/test1/seminar/detail.do?seminarPk=${seminar.seminarPk}">
+                        <div class="card h-100"> <!-- h-100 클래스를 사용하여 카드 높이를 동일하게 맞춤 -->
+                            <img src="${seminar.seminarFilePath}" class="card-img-top" alt="세미나 이미지">
+                            <div class="card-body d-flex flex-column"> <!-- flex-column으로 카드 본문을 세로로 정렬 -->
+                                <h5 class="card-title">${seminar.seminarName}</h5>
+                                <p class="card-text">${seminar.seminarPlace}</p>
+                                <div class="mt-auto"></div> <!-- 하단에 여백을 추가하여 내용이 고정된 높이를 유지하도록 함 -->
+                            </div>
+                        </div>
+                        </a>
                     </div>
-                </div>
+                </c:forEach>
             </div>
-        </c:forEach>
+        </div>
+
+        <!-- 왼쪽으로 스크롤 버튼 -->
+        <button class="scroll-button scroll-button-left" onclick="scrollSeminarList('left')"><</button>
+
+        <!-- 오른쪽으로 스크롤 버튼 -->
+        <button class="scroll-button scroll-button-right" onclick="scrollSeminarList('right')">></button>
     </div>
 </div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 세미나 목록을 왼쪽 또는 오른쪽으로 스크롤하는 함수
+    function scrollSeminarList(direction) {
+        const seminarList = document.querySelector('.seminar-list');
+        const scrollAmount = 250; // 스크롤할 거리
+        if (direction === 'right') {
+            seminarList.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else if (direction === 'left') {
+            seminarList.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    }
+</script>
+<div style="margin-bottom: 300px;"></div>
 </body>
+<%@ include file="footer.jsp" %>
 </html>

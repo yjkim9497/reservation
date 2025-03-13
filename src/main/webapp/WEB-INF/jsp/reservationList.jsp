@@ -3,12 +3,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<c:set var="currentPage" value="reservation" />
 <%@ include file="navbar.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>예약 목록</title>
+    <style>
+    	body {
+    		font-family: 'pretendard';
+    	}
+    </style>
     <script>
         function approveReservation(id) {
             fetch(`/reservation/${id}/approve.do`, { method: 'POST' })

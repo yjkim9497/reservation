@@ -4,7 +4,7 @@ public class LoginVO {
 	private Long userPk;
 	private String userId;       // 사용자 ID
     private String userPassword; // 비밀번호
-    private String userRole;
+    private UserRole userRole;
     
 	public Long getUserPk() {
 		return userPk;
@@ -24,10 +24,10 @@ public class LoginVO {
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
-	public String getUserRole() {
+	public UserRole getUserRole() {
 		return userRole;
 	}
-	public void setUserRole(String userRole) {
+	public void setUserRole(UserRole userRole) {
 		this.userRole = userRole;
 	}
     

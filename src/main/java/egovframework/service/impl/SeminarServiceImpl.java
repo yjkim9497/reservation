@@ -1,6 +1,7 @@
 package egovframework.service.impl;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +23,30 @@ public class SeminarServiceImpl implements SeminarService {
     public void insertSeminar(SeminarVO seminarVO) throws Exception {
 		seminarMapper.insertSeminar(seminarVO);
     }
+	
+	@Override
+	public void deleteSeminar(Long seminarPk) throws Exception {
+		seminarMapper.deleteSeminar(seminarPk);
+	}
+	
+	@Override
+    public List<SeminarVO> getAllSeminars() {
+        return seminarMapper.selectAllSeminars();
+    }
+	
+	@Override
+	public SeminarVO findSeminar(Long seminarPk) {
+		return seminarMapper.findByPk(seminarPk);
+	}
+	
+	@Override
+	public void completeSeminar(Long seminarPk) throws Exception {
+		seminarMapper.updateSeminarCompleted(seminarPk);
+	}
 
     // 세미나 날짜로 세미나 조회
     @Override
     public List<SeminarVO> getSeminarsByDate(LocalDate date) {
-    	System.out.println("세미나 조회 서비스단");
         return seminarMapper.findByDate(date);
     }
 
@@ -40,6 +60,11 @@ public class SeminarServiceImpl implements SeminarService {
     @Override
     public void updateSeminarCurrentPeople(Long seminarPk, int seminarCurrentPeople) {
         seminarMapper.updateSeminarCurrentPeople(seminarPk, seminarCurrentPeople);
+    }
+    
+    @Override
+    public List<Map<Date, Date>> getSeminarDates(){
+    	return seminarMapper.selectSeminarDates();
     }
 
 }
