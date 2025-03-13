@@ -37,8 +37,8 @@
 - 메인화면
   ![image](https://github.com/user-attachments/assets/c94f8c7b-c0d0-4434-a652-11e52f77c99a)
 - 세미나 목록
-  ![image](https://github.com/user-attachments/assets/a5cc4c28-3e81-480d-aa23-694600c6ec2a)
   <br>
+  ![image](https://github.com/user-attachments/assets/a5cc4c28-3e81-480d-aa23-694600c6ec2a)
   ![image](https://github.com/user-attachments/assets/5b220cd6-7fd2-48ad-ab58-4d131c8cb37e)
 
  
